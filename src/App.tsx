@@ -1,0 +1,182 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
+import MainLayout from './components/Layout/MainLayout';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Articles from './pages/Articles';
+import Profile from './pages/Profile';
+import CreateArticle from './pages/CreateArticle';
+import Drafts from './pages/Drafts';
+import Analytics from './pages/Analytics';
+import Tags from './pages/Tags';
+import Settings from './pages/Settings';
+import PublicArticles from './pages/PublicArticles';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import ArticlePage from './pages/ArticlePage';
+
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  
+  if (token) {
+    return <>{children}</>;
+  }
+  return <Navigate to="/login" />;
+};
+
+const AppRoutes: React.FC = () => {
+  const token = localStorage.getItem('token');
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/public/articles" element={<PublicArticles />} />
+      
+      {/* Auth Routes */}
+      <Route 
+        path="/login" 
+        element={token ? <Navigate to="/dashboard" /> : <Login />} 
+      />
+      <Route 
+        path="/register" 
+        element={token ? <Navigate to="/dashboard" /> : <Register />} 
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+      </Route>
+      
+      <Route
+        path="/articles"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Articles />} />
+      </Route>
+      
+      <Route
+        path="/create"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<CreateArticle />} />
+      </Route>
+      
+      <Route
+        path="/drafts"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Drafts />} />
+      </Route>
+      
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Analytics />} />
+      </Route>
+      
+      <Route
+        path="/tags"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Tags />} />
+      </Route>
+      
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Profile />} />
+      </Route>
+      
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Settings />} />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Panel</h1></div>} />
+      </Route>
+
+      {/* Catch all route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="/articles/:id" element={<ArticlePage />} />
+    </Routes>
+  );
+};
+
+function App() {
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider>
+          <AuthProvider>
+            <Router>
+              <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+                <AppRoutes />
+              </div>
+            </Router>
+          </AuthProvider>
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
+  );
+}
+
+export default App;
