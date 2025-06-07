@@ -147,7 +147,7 @@ const LandingPage: React.FC = () => {
                 className="inline-flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
               >
                 <BookOpen className="w-6 h-6" />
-                <span>Explore Blogs</span>
+                <span>Explore Articles</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>

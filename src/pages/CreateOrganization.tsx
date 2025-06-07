@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Upload, UserPlus, X, Mail, Shield, Edit, Eye, Users } from 'lucide-react';
-import Layout from '../components/Layout/Layout';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 interface TeamMember {
@@ -95,7 +94,6 @@ const CreateOrganization: React.FC = () => {
   };
 
   return (
-    <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
           <div className="flex items-center space-x-3 mb-8">
@@ -354,7 +352,6 @@ const CreateOrganization: React.FC = () => {
           </form>
         </div>
       </div>
-    </Layout>
   );
 };
 

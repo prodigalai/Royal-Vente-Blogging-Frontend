@@ -1,50 +1,70 @@
 export interface User {
-  _id: string;
+  id: string;
   username: string;
   displayName: string;
+  emailVerified?: boolean;
   email: string;
   avatarUrl?: string;
   personalBlogSlug?: string;
   systemRole?: string;
   createdAt?: string;
   updatedAt?: string;
+  organizationId?: string;
+  lastLogin?: string;
+  bio?: string;
+  followers?: number;
+  following?: number;
+  joinedDate?: Date;
 }
 
+
 export interface Organization {
-  _id: string;
+  id: string;
   name: string;
-  slug: string;
-  description?: string;
-  logoUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string;
+  logo?: string;
+  createdAt: Date;
+  members: OrganizationMember[];
+  articlesCount: number;
+  isPublic: boolean;
+  ownerId?: string;
 }
 
 export interface OrganizationMember {
-  userId: string;
+  id: string;
   role: OrganizationRole;
-  joinedAt: string;
   user: User;
+  joinedAt: Date;
 }
 
 export interface Article {
   id: string;
   title: string;
+  subtitle?: string;
   content: string;
   excerpt: string;
   coverImage?: string;
-  authorId: string;
   author: User;
-  organizationId?: string;
   organization?: Organization;
   tags: string[];
-  status: ArticleStatus;
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  likes: number;
-  views: number;
+  publishedAt: Date;
+  updatedAt: Date;
   readTime: number;
+  likes: number;
+  comments: number;
+  isBookmarked: boolean;
+  isLiked: boolean;
+  isPublished: boolean;
+  views: number;
+  isDraft: boolean;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  description?: string;
+  followerCount: number;
+  articleCount: number;
 }
 
 export type UserRole = 'super_admin' | 'admin' | 'editor' | 'author' | 'reader';

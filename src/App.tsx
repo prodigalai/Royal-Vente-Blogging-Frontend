@@ -23,6 +23,7 @@ import Contact from './pages/Contact';
 import ArticlePage from './pages/ArticlePage';
 import UserManagement from './pages/UserManagement';
 import UserDashboard from './pages/UserDashboard';
+import CreateOrganization from './pages/CreateOrganization';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -143,6 +144,14 @@ const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<Settings />} />
+      </Route>
+
+      <Route path='/create-organization' element={
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<CreateOrganization/>} />
       </Route>
 
       {/* Admin Routes */}
