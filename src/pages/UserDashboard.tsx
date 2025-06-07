@@ -24,6 +24,8 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const token = localStorage.getItem('token');
 
+  console.log("user", authUser);
+
   // Dummy user fallback for demo/development
   const dummyUser = {
     id: 'demo',
