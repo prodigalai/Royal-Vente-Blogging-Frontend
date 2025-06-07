@@ -49,7 +49,7 @@ const tabs = [
   { id: 'trending', label: 'Trending' },
 ];
 
-const Dashboard: React.FC = () => {
+const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('featured');
   const featuredStory = mockPosts[0];
@@ -195,4 +195,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

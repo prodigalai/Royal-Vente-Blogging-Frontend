@@ -11,7 +11,8 @@ import {
   Building2,
   PenTool,
   Home,
-  BookOpen
+  BookOpen,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -28,7 +29,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8">
-            <Link to="/dashboard" className="flex items-center space-x-2 group">
+            <Link to="/home" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
@@ -89,10 +90,10 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <div className="flex items-center space-x-2">
-                  {user?.avatar ? (
+                  {user?.avatarUrl ? (
                     <img
-                      src={user.avatar}
-                      alt={user.name}
+                      src={user.avatarUrl}
+                      alt={user.displayName}
                       className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : (
@@ -101,8 +102,8 @@ const Header: React.FC = () => {
                     </div>
                   )}
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role.replace('_', ' ')}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.displayName}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.systemRole?.replace('_', ' ')}</p>
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -111,11 +112,19 @@ const Header: React.FC = () => {
               {/* Profile Dropdown */}
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 animate-scale-in">
+                  <Link
+                    to="/user-dashboard"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>My Dashboard</span>
+                  </Link>
                   <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.displayName}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
                     <span className="inline-block mt-1 px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full capitalize">
-                      {user?.role.replace('_', ' ')}
+                      {user?.systemRole?.replace('_', ' ')}
                     </span>
                   </div>
                   

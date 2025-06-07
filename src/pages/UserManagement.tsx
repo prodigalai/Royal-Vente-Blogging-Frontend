@@ -563,12 +563,12 @@ const UserManagement: React.FC = () => {
                             {permission}
                           </span>
                         ))}
-                        {role.id === 'author' && ['Create Blogs', 'Edit Own Blogs'].map(permission => (
+                        {role.id === 'author' && ['Create Articles', 'Edit Own Articles'].map(permission => (
                           <span key={permission} className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs rounded">
                             {permission}
                           </span>
                         ))}
-                        {role.id === 'reader' && ['Read Blogs', 'Comment'].map(permission => (
+                        {role.id === 'reader' && ['Read Articles', 'Comment'].map(permission => (
                           <span key={permission} className="px-2 py-1 bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-300 text-xs rounded">
                             {permission}
                           </span>

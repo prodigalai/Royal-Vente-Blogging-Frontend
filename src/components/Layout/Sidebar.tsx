@@ -23,7 +23,8 @@ const Sidebar: React.FC = () => {
   const token = localStorage.getItem('token');
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home, requiresPermission: false },
+    { name: 'My Dashboard', href: '/user-dashboard', icon: BarChart3, requiresPermission: false },
+    { name: 'Home', href: '/home', icon: Home, requiresPermission: false },
     { name: 'Blogs', href: '/articles', icon: BookOpen, requiresPermission: false },
     { name: 'Create Blogs', href: '/create', icon: PenTool, requiresPermission: false },
     { name: 'Drafts', href: '/drafts', icon: FileText, requiresPermission: false },

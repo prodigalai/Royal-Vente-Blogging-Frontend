@@ -9,7 +9,7 @@ import MainLayout from './components/Layout/MainLayout';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Dashboard';
 import Articles from './pages/Articles';
 import Profile from './pages/Profile';
 import CreateArticle from './pages/CreateArticle';
@@ -22,6 +22,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ArticlePage from './pages/ArticlePage';
 import UserManagement from './pages/UserManagement';
+import UserDashboard from './pages/UserDashboard';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -46,23 +47,23 @@ const AppRoutes: React.FC = () => {
       {/* Auth Routes */}
       <Route 
         path="/login" 
-        element={token ? <Navigate to="/dashboard" /> : <Login />} 
+        element={token ? <Navigate to="/home" /> : <Login />} 
       />
       <Route 
         path="/register" 
-        element={token ? <Navigate to="/dashboard" /> : <Register />} 
+        element={token ? <Navigate to="/home" /> : <Register />} 
       />
 
       {/* Protected Routes */}
       <Route
-        path="/dashboard"
+        path="/home"
         element={
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
+        <Route index element={<Home />} />
       </Route>
       
       <Route
@@ -86,6 +87,8 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<CreateArticle />} />
       </Route>
+      
+
       
       <Route
         path="/drafts"
@@ -161,6 +164,17 @@ const AppRoutes: React.FC = () => {
       <Route path="*" element={<Navigate to="/" replace />} />
 
       <Route path="/articles/:id" element={<ArticlePage />} />
+
+      <Route
+        path="/user-dashboard"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<UserDashboard />} />
+      </Route>
     </Routes>
   );
 };
