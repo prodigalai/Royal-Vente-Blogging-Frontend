@@ -38,27 +38,8 @@ const Header: React.FC = () => {
             </Link>
 
             <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/dashboard"
-                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                <Home className="w-4 h-4" />
-                <span>Home</span>
-              </Link>
-              <Link
-                to="/articles"
-                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>Articles</span>
-              </Link>
-              <Link
-                to="/create"
-                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                <PenTool className="w-4 h-4" />
-                <span>Write</span>
-              </Link>
+           
+             
             </nav>
           </div>
 
@@ -79,6 +60,13 @@ const Header: React.FC = () => {
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
             {/* Theme Toggle */}
+            <Link
+                to="/create"
+                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                <PenTool className="w-4 h-4" />
+                <span>Write</span>
+              </Link>
             <button
               onClick={toggleTheme}
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all hover:scale-105"

@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Building2, Upload, UserPlus, X, Mail, Shield, Edit, Eye, Users } from 'lucide-react';
 import Layout from '../components/Layout/Layout';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 interface TeamMember {
   email: string;
   role: 'admin' | 'editor' | 'contributor' | 'viewer';
 }
+
+const api = axios.create({
+  baseURL: 'https://royal-vente-blogging-system.onrender.com/api/v1',
+});
 
 const CreateOrganization: React.FC = () => {
   const { user } = useAuth();

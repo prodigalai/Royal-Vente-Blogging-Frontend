@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { setCredentials } from '../store/slices/authSlice';
 import { User } from '../types';
+import api from '../utils/axios';
 
 const Login: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -27,41 +28,24 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await api.post('/auth/login', { email, password });
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Invalid email or password');
-        }
+      if (!data.success || !data.data || !data.data.token) {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Check if the response has the expected structure
-      if (data.success && data.data && data.data.token) {
-        // Store the token
-        localStorage.setItem('token', data.data.token);
-        
-        // Dispatch the credentials to Redux store
-        dispatch(setCredentials({
-          user: data.data.user,
-          token: data.data.token
-        }));
-        
-        // Navigate to dashboard
-        navigate('/dashboard', { replace: true });
-      } else {
-        throw new Error('Invalid response format from server');
-      }
+      // Store the token
+      localStorage.setItem('token', data.data.token);
+      // Dispatch the credentials to Redux store
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+      // Navigate to dashboard
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials and try again.');
+      setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }

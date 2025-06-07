@@ -1,51 +1,66 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../utils/axios';
 import { User } from '../../types';
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-}
-
-interface ApiResponse {
-  success: boolean;
-  data: {
-    user: User;
-    token: string;
-  };
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
+  loading: false,
+  error: null,
 };
+
+// Async thunk for login
+export const login = createAsyncThunk(
+  'auth/login',
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      return response.data.data; // { user, token }
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Login failed');
+    }
+  }
+);
+
+// Async thunk for register
+export const register = createAsyncThunk(
+  'auth/register',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/register', formData);
+      return response.data.data; // { user, token }
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Registration failed');
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      action: PayloadAction<ApiResponse>
-    ) => {
-      if (action.payload.success && action.payload.data) {
-        const { user, token } = action.payload.data;
-        state.user = user;
-        state.token = token;
-        state.isAuthenticated = true;
-        // Store token in localStorage for persistence
-        localStorage.setItem('token', token);
-      }
-    },
-    logout: (state) => {
+    logout(state) {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      // Remove token from localStorage
       localStorage.removeItem('token');
     },
-    updateUser: (state, action: PayloadAction<User>) => {
+    setCredentials(state, action) {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      localStorage.setItem('token', action.payload.token);
+    },
+    updateUser: (state, action) => {
       state.user = action.payload;
     },
     // Add a new action to handle token persistence on app load
@@ -57,9 +72,42 @@ const authSlice = createSlice({
       }
     }
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        localStorage.setItem('token', action.payload.token);
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        localStorage.setItem('token', action.payload.token);
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
-export const { setCredentials, logout, updateUser, rehydrateAuth } = authSlice.actions;
+export const { logout, setCredentials, updateUser, rehydrateAuth } = authSlice.actions;
 export default authSlice.reducer;
 
 // Selectors

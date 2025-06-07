@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Image, Globe, UserCircle } from 'lucide-react';
+import api from '../utils/axios';
 
 interface FormData {
   type: string;
@@ -55,24 +56,15 @@ const Register = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+      const response = await api.post('/auth/register', formData);
+      const data = response.data;
+      if (!data.success || !data.data || !data.data.token) {
+        throw new Error(data.message || 'Registration failed');
       }
-
-      const data = await response.json();
       // Handle successful registration
       navigate('/login');
     } catch (error: any) {
-      setErrors({ submit: error.message });
+      setErrors({ submit: error.response?.data?.message || error.message });
     } finally {
       setIsLoading(false);
     }

@@ -1,44 +1,52 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Eye, 
-  Heart, 
-  Clock, 
-  Calendar, 
-  Search, 
-  Filter, 
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Eye,
+  Heart,
+  Clock,
+  Calendar,
+  Search,
+  Filter,
   Tag,
   User,
   BookOpen,
-  TrendingUp
-} from 'lucide-react';
-import { mockArticles } from '../utils/mockData';
-import { format } from 'date-fns';
+  TrendingUp,
+} from "lucide-react";
+import { mockArticles } from "../utils/mockData";
+import { format } from "date-fns";
 
-const Blogs: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
+const Articles: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "popular" | "trending">(
+    "latest"
+  );
 
   // Get all unique tags
-  const allTags = Array.from(new Set(mockArticles.flatMap(article => article.tags)));
+  const allTags = Array.from(
+    new Set(mockArticles.flatMap((article) => article.tags))
+  );
 
   // Filter and sort articles
   const filteredArticles = mockArticles
-    .filter(article => {
-      const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    .filter((article) => {
+      const matchesSearch =
+        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesTag = !selectedTag || article.tags.includes(selectedTag);
       return matchesSearch && matchesTag;
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'popular':
+        case "popular":
           return b.views - a.views;
-        case 'trending':
+        case "trending":
           return b.likes - a.likes;
         default:
-          return new Date(b.publishedAt!).getTime() - new Date(a.publishedAt!).getTime();
+          return (
+            new Date(b.publishedAt!).getTime() -
+            new Date(a.publishedAt!).getTime()
+          );
       }
     });
 
@@ -47,7 +55,9 @@ const Blogs: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Blogs</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Articles
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Discover and explore our collection of articles
           </p>
@@ -89,8 +99,10 @@ const Blogs: React.FC = () => {
               className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">All Tags</option>
-              {allTags.map(tag => (
-                <option key={tag} value={tag}>{tag}</option>
+              {allTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
               ))}
             </select>
           </div>
@@ -100,7 +112,9 @@ const Blogs: React.FC = () => {
             <TrendingUp className="w-5 h-5 text-gray-400" />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'latest' | 'popular' | 'trending')}
+              onChange={(e) =>
+                setSortBy(e.target.value as "latest" | "popular" | "trending")
+              }
               className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="latest">Latest</option>
@@ -111,7 +125,7 @@ const Blogs: React.FC = () => {
         </div>
       </div>
 
-      {/* Blogs Grid */}
+      {/* Articles Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredArticles.map((article) => (
           <article
@@ -127,7 +141,7 @@ const Blogs: React.FC = () => {
                 />
               </div>
             )}
-            
+
             <div className="p-6">
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-3">
@@ -170,7 +184,7 @@ const Blogs: React.FC = () => {
                     {article.author.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {format(new Date(article.publishedAt!), 'MMM d, yyyy')}
+                    {format(new Date(article.publishedAt!), "MMM d, yyyy")}
                   </p>
                 </div>
               </div>
@@ -220,4 +234,4 @@ const Blogs: React.FC = () => {
   );
 };
 
-export default Blogs;
+export default Articles;

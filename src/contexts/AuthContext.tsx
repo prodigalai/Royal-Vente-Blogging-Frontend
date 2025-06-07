@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AuthContextType, User, Organization, RegisterData } from '../types';
 import { setCredentials, logout as logoutAction, updateUser as updateUserAction } from '../store/slices/authSlice';
 import { RootState } from '../store';
+import api from '../utils/axios';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -26,27 +27,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
+      const response = await api.post('/auth/login', { email, password });
+      const data = response.data;
+      if (!data.success || !data.data || !data.data.token) {
         throw new Error(data.message || 'Login failed');
       }
-
-      if (data.success && data.data && data.data.token) {
-        dispatch(setCredentials({
-          user: data.data.user,
-          token: data.data.token
-        }));
-      }
-    } catch (error) {
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+    } catch (error: any) {
       throw error;
     }
   };
@@ -59,27 +49,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: RegisterData) => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
+      const response = await api.post('/auth/register', userData);
+      const data = response.data;
+      if (!data.success || !data.data || !data.data.token) {
         throw new Error(data.message || 'Registration failed');
       }
-
-      if (data.success && data.data && data.data.token) {
-        dispatch(setCredentials({
-          user: data.data.user,
-          token: data.data.token
-        }));
-      }
-    } catch (error) {
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+    } catch (error: any) {
       throw error;
     }
   };
@@ -87,15 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const switchOrganization = async (organizationId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/v1/organizations/${organizationId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await api.get(`/organizations/${organizationId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      if (response.ok) {
-        const orgData = await response.json();
-        setOrganization(orgData);
+      if (response.status === 200) {
+        setOrganization(response.data);
       }
     } catch (error) {
       console.error('Error switching organization:', error);
