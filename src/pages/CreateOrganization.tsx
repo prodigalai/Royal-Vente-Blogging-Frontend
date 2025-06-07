@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Upload, UserPlus, X, Mail, Shield, Edit, Eye, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import api from '../utils/axios';
 
 interface TeamMember {
   email: string;
   role: 'admin' | 'editor' | 'contributor' | 'viewer';
 }
-
-const api = axios.create({
-  baseURL: 'https://royal-vente-blogging-system.onrender.com/api/v1',
-});
 
 const CreateOrganization: React.FC = () => {
   const { user } = useAuth();
@@ -55,6 +51,7 @@ const CreateOrganization: React.FC = () => {
       setFormData(prev => ({ ...prev, logo: URL.createObjectURL(file) }));
     }
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -83,14 +80,12 @@ const CreateOrganization: React.FC = () => {
     }
   };
 
-
-
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
         <div className="flex items-center space-x-3 mb-8">
-          <div className="p-3 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800 rounded-xl">
-            <Building2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+          <div className="p-3 bg-gradient-to-br from-[#1495ff] to-[#1495ff] dark:from-[#1495ff] dark:to-[#1495ff] rounded-xl">
+            <Building2 className="w-6 h-6 text-[#fff] dark:text-[#fff]" />
           </div>
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
@@ -119,7 +114,7 @@ const CreateOrganization: React.FC = () => {
                 required
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1495ff] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
                 placeholder="Enter organization name"
               />
             </div>
@@ -135,7 +130,7 @@ const CreateOrganization: React.FC = () => {
                 rows={4}
                 value={formData.description}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1495ff] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
                 placeholder="Describe your organization's mission and goals"
               />
             </div>
@@ -179,7 +174,7 @@ const CreateOrganization: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || !formData.name.trim() || !formData.description.trim()}
-              className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="flex items-center space-x-2 bg-gradient-to-r from-[#1495ff] to-[#1495ff] text-white px-6 py-3 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -206,7 +201,7 @@ const CreateOrganization: React.FC = () => {
               {/* Button to choose picture */}
               <button
                 onClick={() => document.getElementById('fileInput')?.click()}
-                className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-all duration-200"
+                className="w-full bg-[#1495ff] text-white py-3 rounded-lg hover:bg-[#1495ff] transition-all duration-200"
               >
                 Choose Picture
               </button>

@@ -110,7 +110,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
               </div>
               <button
                 type="button"
-                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium text-sm transition-colors"
+                className="text-[#1495ff] dark:text-[#1495ff] hover:text-[#1495ff] dark:hover:text-[#1495ff] font-medium text-sm transition-colors"
               >
                 Change
               </button>
@@ -129,7 +129,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email address"
               required
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#1495ff] focus:border-[#1495ff] dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
             />
           </div>
 
@@ -142,7 +142,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
               id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-white transition-colors appearance-none bg-white dark:bg-gray-700"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#1495ff] focus:border-[#1495ff] dark:bg-gray-700 dark:text-white transition-colors appearance-none bg-white dark:bg-gray-700"
             >
               <option value="member">Member</option>
               <option value="editor">Editor</option>
@@ -169,7 +169,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
             <button
               type="submit"
               disabled={loading || !email}
-              className="flex-1 flex items-center justify-center space-x-2 bg-emerald-600 dark:bg-emerald-700 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center space-x-2 bg-[#1495ff] dark:bg-[#1495ff] text-white px-6 py-3 rounded-lg hover:bg-[#1495ff] dark:hover:bg-[#1495ff] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
               <span>{loading ? 'Sending...' : 'Send Invite'}</span>
