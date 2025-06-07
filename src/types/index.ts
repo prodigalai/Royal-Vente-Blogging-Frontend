@@ -1,14 +1,20 @@
 export interface User {
-  _id: string;
+  id: string;
   username: string;
   displayName: string;
-  emailVerified: boolean;
+  emailVerified?: boolean;
   email: string;
   avatarUrl?: string;
   personalBlogSlug?: string;
   systemRole?: string;
   createdAt?: string;
   updatedAt?: string;
+  organizationId?: string;
+  lastLogin?: string;
+  bio?: string;
+  followers?: number;
+  following?: number;
+  joinedDate?: Date;
 }
 
 
@@ -21,13 +27,14 @@ export interface Organization {
   members: OrganizationMember[];
   articlesCount: number;
   isPublic: boolean;
+  ownerId?: string;
 }
 
 export interface OrganizationMember {
-  userId: string;
+  id: string;
   role: OrganizationRole;
-  joinedAt: string;
   user: User;
+  joinedAt: Date;
 }
 
 export interface Article {
@@ -48,6 +55,7 @@ export interface Article {
   isBookmarked: boolean;
   isLiked: boolean;
   isPublished: boolean;
+  views: number;
   isDraft: boolean;
 }
 

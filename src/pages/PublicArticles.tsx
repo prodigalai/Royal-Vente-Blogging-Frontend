@@ -13,7 +13,7 @@ import {
   TrendingUp,
   ArrowRight
 } from 'lucide-react';
-import { mockArticles } from '../utils/mockData';
+import { mockArticles } from '../data/mockData';
 import { format } from 'date-fns';
 import PublicNavbar from '../components/Layout/PublicNavbar';
 

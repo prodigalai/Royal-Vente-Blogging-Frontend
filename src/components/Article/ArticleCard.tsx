@@ -10,9 +10,12 @@ interface ArticleCardProps {
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, variant = 'default' }) => {
-  const formatDate = (date: Date) => {
-    return format(date, 'MMM d, yyyy');
-  };
+  const formatDate = (date: string | Date) => {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(parsedDate.getTime())) return 'Invalid date';
+  return format(parsedDate, 'MMM d, yyyy');
+};
+
 
   if (variant === 'featured') {
     return (

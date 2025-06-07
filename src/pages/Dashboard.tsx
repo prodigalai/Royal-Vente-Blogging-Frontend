@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Eye, 
-  Heart, 
-  MessageCircle,
-  Calendar,
   ArrowRight,
-  Tag as TagIcon,
   Star,
   Clock,
   TrendingUp,
   BookOpen,
   Users,
   Building2,
-  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { mockTags, mockArticles, mockOrganizations } from '../data/mockData';
+import {mockArticles, mockOrganizations, mockTags } from '../data/mockData';
 import ArticleCard from '../components/Article/ArticleCard';
 
 const featuredArticle = mockArticles[0];

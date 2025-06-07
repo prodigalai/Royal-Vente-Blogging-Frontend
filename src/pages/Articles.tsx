@@ -12,7 +12,7 @@ import {
   BookOpen,
   TrendingUp,
 } from "lucide-react";
-import { mockArticles } from "../utils/mockData";
+import { mockArticles } from "../data/mockData";
 import { format } from "date-fns";
 
 const Articles: React.FC = () => {

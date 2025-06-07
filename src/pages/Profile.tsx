@@ -26,7 +26,7 @@ import {
   Key
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { mockOrganizations, mockUsers } from '../utils/mockData';
+import { mockOrganizations, mockUsers } from '../data/mockData';
 import { format } from 'date-fns';
 
 interface OrganizationManagementProps {
