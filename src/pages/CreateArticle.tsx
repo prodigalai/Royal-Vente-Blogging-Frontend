@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../utils/axios';
 import {
   Save,
   Eye,
@@ -51,6 +52,7 @@ const CreateBlog: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeTab, setActiveTab] = useState<'content' | 'design' | 'seo'>('content');
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   const modules = {
     toolbar: [
@@ -87,28 +89,43 @@ const CreateBlog: React.FC = () => {
   ];
 
   const handleSave = async (status: 'draft' | 'published') => {
-    setIsSaving(true);
-    const metadata: any = {
-      imageBuffer: blog.imageBuffer,
-      mimeType: blog.mimeType,
-      description: blog.excerpt,
-      authorNames: blog.authorNames.filter(Boolean),
-      authorProfiles: blog.authorProfiles.filter(Boolean),
-      status,
-      tags: blog.tags,
-      category: blog.category,
-      externalLinks: blog.externalLinks.filter(l => l.title && l.url),
-      readingTime: Math.ceil(blog.content.replace(/<[^>]*>/g, '').split(' ').length / 200),
-    };
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log('Saving blog:', {
-      title: blog.title,
-      content: blog.content,
-      metadata,
-    });
-    setIsSaving(false);
-    if (status === 'published') {
-      navigate('/blogs');
+    try {
+      setIsSaving(true);
+      if (!blog.content) {
+        alert('Description is required!');
+        setIsSaving(false);
+        return;
+      }
+      const payload = {
+        imageBuffer: blog.imageBuffer,
+        mimeType: blog.mimeType,
+        title: blog.title,
+        description: blog.content,
+        authorNames: blog.authorNames.filter(Boolean),
+        status,
+        tags: blog.tags,
+        category: blog.category,
+        externalLinks: blog.externalLinks.filter(l => l.title && l.url),
+      };
+      console.log('Payload:', payload);
+      const username = "ashwini";
+      const token = localStorage.getItem('token');
+      if (!username) throw new Error('Username not found');
+      if (!token) throw new Error('Authentication token not found');
+      const response = await api.post(`/blogs/personal/${username}/blogs`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Blog saved successfully:', response.data);
+      if (status === 'published') {
+        navigate('/articles');
+      }
+    } catch (error) {
+      console.error('Error saving blog:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -143,9 +160,9 @@ const CreateBlog: React.FC = () => {
       reader.onloadend = () => {
         setBlog((prev) => ({
           ...prev,
+          coverImage: reader.result as string,
           imageBuffer: (reader.result as string).split(',')[1],
           mimeType: file.type,
-          coverImage: URL.createObjectURL(file),
         }));
       };
       reader.readAsDataURL(file);
@@ -225,9 +242,9 @@ const CreateBlog: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => navigate('/blogs')}
+                  onClick={() => navigate('/articles')}
                   className="group flex items-center justify-center w-11 h-11 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-800 dark:to-gray-700 hover:from-slate-200 hover:to-slate-300 dark:hover:from-gray-700 dark:hover:to-gray-800 rounded-xl transition-all duration-300 hover:scale-105 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  aria-label="Back to blogs"
+                  aria-label="Back to articles"
                 >
                   <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-gray-300 group-hover:-translate-x-0.5 transition-transform" />
                 </button>

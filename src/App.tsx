@@ -75,6 +75,7 @@ const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<Articles />} />
+        <Route path=":id" element={<ArticlePage />} />
       </Route>
       
       <Route
@@ -162,8 +163,6 @@ const AppRoutes: React.FC = () => {
 
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
-
-      <Route path="/articles/:id" element={<ArticlePage />} />
 
       <Route
         path="/user-dashboard"
