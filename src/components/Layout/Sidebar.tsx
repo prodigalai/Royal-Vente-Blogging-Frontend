@@ -35,8 +35,6 @@ const Sidebar: React.FC = () => {
     { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },
   ];
 
-
-
   const shouldShowNavItem = (item: any) => {
     if (!token) return false;
     if (!item.requiresPermission) return true;
@@ -48,11 +46,11 @@ const Sidebar: React.FC = () => {
   if (!token) return null;
 
   return (
-    <div className="h-screen w-16 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 flex flex-col justify-between items-center py-4 fixed left-0 top-0 z-40 transition-colors">
+    <div className="h-screen w-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-800 flex flex-col justify-between items-center py-4 fixed left-0 top-0 z-40 transition-colors">
       {/* Logo */}
       <div className="mb-4">
-        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center transition-colors">
-          <span className="text-xl font-bold text-gray-900 dark:text-white">Y</span>
+        <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center transition-colors">
+          <span className="text-xl font-bold text-white">Y</span>
         </div>
       </div>
       {/* Main Navigation */}
@@ -67,8 +65,8 @@ const Sidebar: React.FC = () => {
               to={item.href}
               className={`group relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
                 active
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-[#1495ff]/30 text-[#1495ff]'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#1495ff] dark:hover:text-white'
               }`}
             >
               <Icon className="w-5 h-5" />
@@ -85,7 +83,7 @@ const Sidebar: React.FC = () => {
       {/* User Role Badge & Logout */}
       <div className="flex flex-col items-center gap-3">
         <div className="relative group">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center transition-colors cursor-pointer hover:scale-105 transform duration-200">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center transition-colors cursor-pointer hover:scale-105 transform duration-200">
             <Shield className="w-4 h-4 text-white" />
           </div>
           {/* Enhanced Tooltip */}

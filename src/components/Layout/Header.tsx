@@ -30,10 +30,10 @@ const Header: React.FC = () => {
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8">
             <Link to="/home" className="flex items-center space-x-2 group">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-200">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-200">
                 <PenTool className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-[#1495ff] to-[#1495ff] bg-clip-text text-transparent">
                 Royal Venture
               </span>
             </Link>
@@ -52,7 +52,7 @@ const Header: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search articles..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-700 transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-[#1495ff] focus:bg-white dark:focus:bg-gray-700 transition-all"
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
               />
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
             {/* Theme Toggle */}
             <Link
               to="/create"
-              className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-[#1495ff] dark:hover:text-[#1495ff] transition-colors"
             >
               <PenTool className="w-4 h-4" />
               <span>Write</span>
@@ -104,7 +104,7 @@ const Header: React.FC = () => {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
                   )}
@@ -144,14 +144,14 @@ const Header: React.FC = () => {
                         className={cn(
                           "text-xs",
                           user?.emailVerified
-                            ? "text-green-600 border-green-600 bg-transparent"
+                            ? "text-[#1495ff] border-[#1495ff] bg-transparent"
                             : "text-red-600 border-red-600 bg-transparent"
                         )}
                       >
                         {user?.emailVerified ? "Verified" : "Not Verified"}
                       </Badge>
                     </div>
-                    <span className="inline-block mt-1 px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full capitalize">
+                    <span className="inline-block mt-1 px-2 py-1 text-xs bg-[#1495ff]/20 text-[#1495ff] rounded-full capitalize">
                       {user?.systemRole?.replace("_", " ")}
                     </span>
                   </div>

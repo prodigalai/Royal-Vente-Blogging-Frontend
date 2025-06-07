@@ -38,7 +38,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, variant = 'default' 
                 {article.tags.slice(0, 2).map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-emerald-600 text-xs font-medium rounded-full"
+                    className="px-2 py-1 bg-[#1495ff] text-xs font-medium rounded-full"
                   >
                     {tag}
                   </span>
@@ -108,7 +108,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, variant = 'default' 
               </span>
             </div>
             
-            <h3 className="font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors mb-1 line-clamp-2">
+            <h3 className="font-semibold text-gray-900 group-hover:text-[#1495ff] transition-colors mb-1 line-clamp-2">
               {article.title}
             </h3>
             
@@ -175,7 +175,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, variant = 'default' 
         
         <div className="flex space-x-4">
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors mb-2 line-clamp-2">
+            <h2 className="text-xl font-bold text-gray-900 group-hover:text-[#1495ff] transition-colors mb-2 line-clamp-2">
               {article.title}
             </h2>
             
