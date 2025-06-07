@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Plus,
@@ -18,11 +18,18 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { mockPosts, mockOrganizations } from '../data/mockData';
 import { format } from 'date-fns';
+import api from '../utils/axios';
+import axios from 'axios';
 
 const UserDashboard = () => {
   const { user: authUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const token = localStorage.getItem('token');
+  const [userOrgs, setUserOrgs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  
 
   console.log("user", authUser);
 
@@ -48,15 +55,34 @@ const UserDashboard = () => {
     );
   }
 
+ useEffect(() => {
+  const fetchOrganizations = async () => {
+    try {
+      const response = await axios.get(
+        `https://royal-vente-blogging-system.onrender.com/api/v1/orgs/created-by/${authUser._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserOrgs(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to load organizations');
+      setLoading(false);
+    }
+  };
+
+  fetchOrganizations();
+}, [authUser._id, token]);
+
+
   // Filter posts and organizations for this user
   const userBlogs = mockPosts.filter(
     (post) => post.author && post.author.id === user.id
   );
-  const userOrgs = mockOrganizations.filter((org) =>
-    org.members && org.members.some(
-      (member) => member.user && member.user.id === user.id
-    )
-  );
+  
 
   const drafts = userBlogs.filter((post) => post.status === 'draft');
   const published = userBlogs.filter((post) => post.status === 'published');
