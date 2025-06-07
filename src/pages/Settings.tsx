@@ -110,7 +110,7 @@ const Settings: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users/me', {
+        const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/me', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -140,7 +140,7 @@ const Settings: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+      const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const Settings: React.FC = () => {
 
   const handleExportData = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/users/export', {
+      const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/export', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -192,7 +192,7 @@ const Settings: React.FC = () => {
   const handleDeleteAccount = async () => {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users/me', {
+        const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/me', {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

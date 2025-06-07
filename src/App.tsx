@@ -20,7 +20,7 @@ import Settings from './pages/Settings';
 import PublicArticles from './pages/PublicArticles';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import ArticlePage from './pages/ArticlePage';
+import ArticlePage from './pages/ArticlePage'; // Ensure you import your ArticlePage component
 import UserManagement from './pages/UserManagement';
 import UserDashboard from './pages/UserDashboard';
 import CreateOrganization from './pages/CreateOrganization';
@@ -76,7 +76,7 @@ const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<Articles />} />
-        <Route path=":id" element={<ArticlePage />} />
+        <Route path=":id" element={<ArticlePage />} />  {/* Add the dynamic route for ArticlePage */}
       </Route>
       
       <Route
@@ -89,8 +89,6 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<CreateArticle />} />
       </Route>
-      
-
       
       <Route
         path="/drafts"
@@ -151,7 +149,7 @@ const AppRoutes: React.FC = () => {
           <MainLayout />
         </ProtectedRoute>
       }>
-        <Route index element={<CreateOrganization/>} />
+        <Route index element={<CreateOrganization />} />
       </Route>
 
       {/* Admin Routes */}
