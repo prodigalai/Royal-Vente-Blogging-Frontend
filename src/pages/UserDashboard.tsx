@@ -28,10 +28,6 @@ const UserDashboard = () => {
   const [userOrgs, setUserOrgs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  
-
-  console.log("user", authUser);
 
   // Dummy user fallback for demo/development
   const dummyUser = {
@@ -76,6 +72,8 @@ const UserDashboard = () => {
 
   fetchOrganizations();
 }, [authUser._id, token]);
+
+console.log("userOrgs", userOrgs);
 
 
   // Filter posts and organizations for this user
@@ -199,7 +197,7 @@ const UserDashboard = () => {
 
       {/* Organizations Tab */}
       {activeTab === 'organizations' && (
-        <OrgSection orgs={userOrgs} userId={user.id} />
+        <OrgSection orgs={userOrgs.data} userId={user.id} />
       )}
 
       {/* Analytics Tab */}
@@ -408,83 +406,82 @@ const Section = ({ title, items, draft }) => (
 
 const OrgSection = ({ orgs, userId }) => (
   <div>
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-      My Organizations
-    </h2>
-    {orgs.length > 0 ? (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {orgs.map((org) => {
-          const membership = org.members.find(
-            (m) => m.user && m.user.id === userId
-          );
-          return (
-            <div
-              key={org.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all transform hover:scale-105"
-            >
-              <div className="flex items-center space-x-3 mb-4">
-                {org.logo && (
-                  <img
-                    src={org.logo}
-                    alt={org.name}
-                    className="w-12 h-12 rounded-lg object-cover"
-                  />
-                )}
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {org.name}
-                  </h3>
-                  <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs rounded-full capitalize">
-                    {membership?.role}
-                  </span>
-                </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">My Organizations</h2>
+            {orgs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {orgs.map((org) => {
+                  const userMembership = org.members.find(orgs => orgs.user.id === userId);
+                  return (
+                    <div
+                      key={org.id}
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200 transform hover:scale-105"
+                    >
+                      <div className="flex items-center space-x-3 mb-4">
+                        {org.logo && (
+                          <img
+                            src={org.logo}
+                            alt={org.name}
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-gray-900 dark:text-white">
+                            {org.name}
+                          </h3>
+                          <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs rounded-full capitalize">
+                            {userMembership?.role}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                        {org.description}
+                      </p>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span className="flex items-center space-x-1">
+                          <FileText className="w-4 h-4" />
+                          <span>{org.articlesCount} articles</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Users className="w-4 h-4" />
+                          <span>{org.members.length} members</span>
+                        </span>
+                      </div>
+
+                      {userMembership?.role === 'owner' && (
+                        <div className="flex items-center space-x-2">
+                          <button className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3 py-2 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 text-sm">
+                            Manage
+                          </button>
+                          <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <Users className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                {org.description}
-              </p>
-              <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                <span className="flex items-center space-x-1">
-                  <FileText className="w-4 h-4" />
-                  <span>{org.articlesCount} blogs</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <Users className="w-4 h-4" />
-                  <span>{org.members.length} members</span>
-                </span>
+            ) : (
+              <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  No organizations yet
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Create or join an organization to collaborate with others.
+                </p>
+                <Link
+                  to="/create-organization"
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 transform hover:scale-105"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>Create an organization</span>
+                </Link>
               </div>
-              {membership?.role === 'admin' && (
-                <div className="flex items-center space-x-2">
-                  <button className="flex-1 bg-emerald-600 dark:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm">
-                    Manage
-                  </button>
-                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 rounded-lg">
-                    <Users className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          No organizations yet
-        </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          Create or join an organization to collaborate with others.
-        </p>
-        <Link
-          to="/create-organization"
-          className="inline-flex items-center space-x-2 bg-emerald-600 dark:bg-emerald-700 text-white px-6 py-3 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105"
-        >
-          <Building2 className="w-4 h-4" />
-          <span>Create an organization</span>
-        </Link>
-      </div>
-    )}
-  </div>
+            )}
+          </div>
 );
 
 const Analytics = ({ totalLikes, avgReadTime, pubRate }) => (
