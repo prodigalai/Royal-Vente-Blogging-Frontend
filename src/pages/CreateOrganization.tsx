@@ -65,7 +65,7 @@ const CreateOrganization: React.FC = () => {
         {
           name: formData.name,
           description: formData.description,
-          logo: formData.logo,
+          // logo: formData.logo,
         },
         {
           headers: {

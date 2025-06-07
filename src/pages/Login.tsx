@@ -43,7 +43,7 @@ const Login: React.FC = () => {
         token: data.data.token
       }));
       // Navigate to dashboard
-      navigate('/dashboard', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials and try again.');
     } finally {
