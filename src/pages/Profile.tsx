@@ -335,7 +335,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users/me', {
+        const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/me', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -357,7 +357,7 @@ const Profile: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+      const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
