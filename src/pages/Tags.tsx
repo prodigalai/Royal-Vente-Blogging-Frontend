@@ -35,7 +35,7 @@ const Tags: React.FC = () => {
     {
       id: 'tag_1',
       name: 'Technology',
-      description: 'Articles about latest technology trends and innovations',
+      description: 'Blogs about latest technology trends and innovations',
       articleCount: 24,
       totalViews: 15420,
       color: '#3B82F6',
@@ -186,7 +186,7 @@ const Tags: React.FC = () => {
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                   <div className="flex items-center space-x-2">
                     <BookOpen className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Articles</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Blogs</span>
                   </div>
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {tag.articleCount}

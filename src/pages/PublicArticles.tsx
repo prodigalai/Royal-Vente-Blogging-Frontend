@@ -190,10 +190,10 @@ const PublicArticles: React.FC = () => {
           </div>
         )}
 
-        {/* Other Articles */}
+        {/* Other Blogs */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Latest Articles</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Latest Blogs</h2>
             <Link
               to="/register"
               className="flex items-center space-x-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"

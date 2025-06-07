@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
   ];
 
   const adminNavigation = [
-    { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: false },
+    { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: { resource: 'users', action: 'manage' } },
     { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
     { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
     { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },

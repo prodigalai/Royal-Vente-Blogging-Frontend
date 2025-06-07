@@ -15,7 +15,7 @@ import {
 import { mockArticles } from '../utils/mockData';
 import { format } from 'date-fns';
 
-const Articles: React.FC = () => {
+const Blogs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
@@ -47,7 +47,7 @@ const Articles: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Articles</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Blogs</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Discover and explore our collection of articles
           </p>
@@ -111,7 +111,7 @@ const Articles: React.FC = () => {
         </div>
       </div>
 
-      {/* Articles Grid */}
+      {/* Blogs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredArticles.map((article) => (
           <article
@@ -220,4 +220,4 @@ const Articles: React.FC = () => {
   );
 };
 
-export default Articles;
+export default Blogs;

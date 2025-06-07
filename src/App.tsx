@@ -21,6 +21,7 @@ import PublicArticles from './pages/PublicArticles';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import ArticlePage from './pages/ArticlePage';
+import UserManagement from './pages/UserManagement';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -96,7 +97,6 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<Drafts />} />
       </Route>
-      
       <Route
         path="/analytics"
         element={
@@ -150,7 +150,11 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Panel</h1></div>} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="organizations" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Organizations Management</h1></div>} />
+        <Route path="settings" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Settings</h1></div>} />
+        <Route path="security" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Security Settings</h1></div>} />
+        <Route index element={<Navigate to="/admin/users" replace />} />
       </Route>
 
       {/* Catch all route */}
