@@ -195,21 +195,52 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [isInsertVisible, setIsInsertVisible] = useState(false)
   const [currentLine, setCurrentLine] = useState<HTMLElement | null>(null)
 
-  // Initialize content
+  // Initialize content and ensure proper structure
   useEffect(() => {
-    if (editorRef.current && content !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = content || "<p><br></p>"
+    if (editorRef.current) {
+      if (!content || content.trim() === "") {
+        editorRef.current.innerHTML = "<p><br></p>"
+      } else if (content !== editorRef.current.innerHTML) {
+        editorRef.current.innerHTML = content
+      }
+    }
+  }, [])
+
+  // Ensure editor always has at least one paragraph
+  const ensureEditorStructure = useCallback(() => {
+    if (!editorRef.current) return
+
+    // If editor is completely empty, add a paragraph
+    if (editorRef.current.children.length === 0 || editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = "<p><br></p>"
+    }
+
+    // If editor only contains text nodes, wrap them in a paragraph
+    const hasOnlyTextNodes = Array.from(editorRef.current.childNodes).every(
+      node => node.nodeType === Node.TEXT_NODE || (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'BR')
+    )
+
+    if (hasOnlyTextNodes && editorRef.current.childNodes.length > 0) {
+      const p = document.createElement('p')
+      while (editorRef.current.firstChild) {
+        p.appendChild(editorRef.current.firstChild)
+      }
+      if (p.innerHTML.trim() === '') {
+        p.innerHTML = '<br>'
+      }
+      editorRef.current.appendChild(p)
     }
   }, [])
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
+      ensureEditorStructure()
       const newContent = editorRef.current.innerHTML
       if (newContent !== content) {
         onChange(newContent)
       }
     }
-  }, [content, onChange])
+  }, [content, onChange, ensureEditorStructure])
 
   const handleSelection = useCallback(() => {
     const selection = window.getSelection()
@@ -239,7 +270,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     return text === '' || innerHTML === '<br>' || innerHTML === ''
   }
 
-  const getLineElement = (element: HTMLElement): HTMLElement | null => {
+  const getLineElement = (element: HTMLElement | null): HTMLElement | null => {
+    if (!element || !editorRef.current) return null
+    
     // Find the closest block-level element that represents a line
     let current = element
     while (current && current !== editorRef.current) {
@@ -249,43 +282,60 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }
       current = current.parentElement as HTMLElement
     }
-    return element
+    
+    // If we reach here, try to find the first paragraph in the editor
+    const firstP = editorRef.current.querySelector('p')
+    return firstP as HTMLElement || null
   }
 
   const handleCursorPosition = useCallback(() => {
+    if (!editorRef.current) {
+      setIsInsertVisible(false)
+      return
+    }
+
+    ensureEditorStructure()
+
     const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0 || !editorRef.current) {
+    if (!selection || selection.rangeCount === 0) {
       setIsInsertVisible(false)
       return
     }
 
     const range = selection.getRangeAt(0)
     const container = range.startContainer
-    const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement)
+    const element = container.nodeType === Node.TEXT_NODE 
+      ? container.parentElement 
+      : (container as HTMLElement)
     
-    if (element && editorRef.current.contains(element)) {
-      const lineElement = getLineElement(element)
-      const rect = editorRef.current.getBoundingClientRect()
-      const elementRect = (lineElement as HTMLElement).getBoundingClientRect()
-      
-      // Check if the current line is empty and cursor is at the beginning
-      if (lineElement && isEmptyLine(lineElement) && range.startOffset === 0) {
-        const top = elementRect.top - rect.top + elementRect.height / 2 - 18
-        setInsertPosition({
-          top: Math.max(0, top),
-          left: -45,
-        })
-        setCurrentLine(lineElement)
-        setIsInsertVisible(true)
-      } else {
-        setIsInsertVisible(false)
-        setCurrentLine(null)
-      }
+    if (!element || !editorRef.current.contains(element)) {
+      setIsInsertVisible(false)
+      return
+    }
+
+    const lineElement = getLineElement(element)
+    if (!lineElement) {
+      setIsInsertVisible(false)
+      return
+    }
+
+    const rect = editorRef.current.getBoundingClientRect()
+    const elementRect = lineElement.getBoundingClientRect()
+    
+    // Check if the current line is empty and cursor is at the beginning
+    if (isEmptyLine(lineElement) && range.startOffset === 0) {
+      const top = elementRect.top - rect.top + elementRect.height / 2 - 18
+      setInsertPosition({
+        top: Math.max(0, top),
+        left: -45,
+      })
+      setCurrentLine(lineElement)
+      setIsInsertVisible(true)
     } else {
       setIsInsertVisible(false)
       setCurrentLine(null)
     }
-  }, [])
+  }, [ensureEditorStructure])
 
   // Listen for selection changes and cursor movement
   useEffect(() => {
@@ -352,7 +402,34 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const insertContent = useCallback(
     (type: string) => {
-      if (!currentLine || !editorRef.current) return
+      if (!editorRef.current) return
+
+      ensureEditorStructure()
+
+      // If no currentLine, try to get the current line based on cursor position
+      let targetLine = currentLine
+      if (!targetLine) {
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0)
+          const container = range.startContainer
+          const element = container.nodeType === Node.TEXT_NODE 
+            ? container.parentElement 
+            : (container as HTMLElement)
+          targetLine = getLineElement(element)
+        }
+      }
+
+      // If still no target line, use the first paragraph or create one
+      if (!targetLine) {
+        targetLine = editorRef.current.querySelector('p') as HTMLElement
+        if (!targetLine) {
+          const newP = document.createElement('p')
+          newP.innerHTML = '<br>'
+          editorRef.current.appendChild(newP)
+          targetLine = newP
+        }
+      }
 
       let element: HTMLElement
       let imageUrl = ""
@@ -404,49 +481,53 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           return
       }
 
-      // Replace the current empty line with the new element
-      currentLine.parentNode?.replaceChild(element, currentLine)
+      try {
+        // Replace the current empty line with the new element
+        targetLine.parentNode?.replaceChild(element, targetLine)
 
-      // For image and divider, add a new paragraph after
-      if (type === "image" || type === "divider") {
-        const newP = document.createElement("p")
-        newP.innerHTML = "<br>"
-        newP.contentEditable = "true"
-        element.parentNode?.insertBefore(newP, element.nextSibling)
-      }
+        // For image and divider, add a new paragraph after
+        if (type === "image" || type === "divider") {
+          const newP = document.createElement("p")
+          newP.innerHTML = "<br>"
+          newP.contentEditable = "true"
+          element.parentNode?.insertBefore(newP, element.nextSibling)
+        }
 
-      // Focus the new element if it's editable
-      if (element.contentEditable === "true") {
-        setTimeout(() => {
-          element.focus()
-          const range = document.createRange()
-          const sel = window.getSelection()
-          range.selectNodeContents(element)
-          range.collapse(false)
-          sel?.removeAllRanges()
-          sel?.addRange(range)
-        }, 100)
-      } else if (type === "image" || type === "divider") {
-        // Focus the paragraph after image/divider
-        const nextP = element.nextSibling as HTMLElement
-        if (nextP) {
+        // Focus the new element if it's editable
+        if (element.contentEditable === "true") {
           setTimeout(() => {
-            nextP.focus()
+            element.focus()
             const range = document.createRange()
             const sel = window.getSelection()
-            range.setStart(nextP, 0)
-            range.collapse(true)
+            range.selectNodeContents(element)
+            range.collapse(false)
             sel?.removeAllRanges()
             sel?.addRange(range)
           }, 100)
+        } else if (type === "image" || type === "divider") {
+          // Focus the paragraph after image/divider
+          const nextP = element.nextSibling as HTMLElement
+          if (nextP) {
+            setTimeout(() => {
+              nextP.focus()
+              const range = document.createRange()
+              const sel = window.getSelection()
+              range.setStart(nextP, 0)
+              range.collapse(true)
+              sel?.removeAllRanges()
+              sel?.addRange(range)
+            }, 100)
+          }
         }
+      } catch (error) {
+        console.error('Error inserting content:', error)
       }
 
       setIsInsertVisible(false)
       setCurrentLine(null)
       handleInput()
     },
-    [currentLine, handleInput],
+    [currentLine, handleInput, ensureEditorStructure],
   )
 
   const handleKeyDown = useCallback(
@@ -465,7 +546,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
       }
 
-      // Handle Enter key for special elements to create normal paragraphs
       if (e.key === "Enter" && !e.shiftKey) {
         const selection = window.getSelection()
         if (selection && selection.rangeCount > 0) {
@@ -473,7 +553,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           const container = range.startContainer
           const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement)
 
-          // Check if we're in a heading or blockquote
           if (element) {
             const blockElement = element.closest('h1, h2, h3, h4, h5, h6, blockquote')
             if (blockElement) {
@@ -563,6 +642,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onKeyUp={handleCursorPosition}
         onKeyDown={handleKeyDown}
         onClick={handleCursorPosition}
+        onFocus={handleCursorPosition}
         className="min-h-[400px] relative transition-all duration-200"
         style={{
           fontSize: "21px",
@@ -578,7 +658,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         suppressContentEditableWarning={true}
       />
 
-      {(!content || content === "<p><br></p>") && (
+      {(!content || content === "<p><br></p>" || content.trim() === "") && (
         <div
           className="absolute pointer-events-none text-gray-400 italic transition-opacity duration-300"
           style={{
