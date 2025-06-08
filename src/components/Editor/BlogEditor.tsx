@@ -172,7 +172,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ initialArticle, onSave, 
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="w-full mx-auto px-4">
         <EditorToolbar
           onPublish={() => setIsPublishSidebarOpen(true)}
           onSave={handleManualSave}
@@ -193,7 +193,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ initialArticle, onSave, 
           </div>
         </div>
 
-        <div className="fixed bottom-4 left-4 cursor-pointer" onClick={retryAutoSave}>
+        <div className="fixed bottom-4 right-4 cursor-pointer" onClick={retryAutoSave}>
           <AutoSaveIndicator status={autoSaveStatus} lastSaved={lastSaved} />
         </div>
       </div>
