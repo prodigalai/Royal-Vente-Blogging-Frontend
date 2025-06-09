@@ -14,24 +14,6 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface TabProps {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
-      isActive
-        ? "text-primary-800 border-primary-800"
-        : "text-gray-500 border-transparent hover:text-primary-800 hover:border-primary-300"
-    }`}
-  >
-    {label}
-  </button>
-);
 
 interface StoryCardProps {
   title: string;
@@ -123,80 +105,77 @@ const Profile: React.FC = () => {
     },
   ];
 
+  const tabOptions = [
+  { key: "Home", label: "Home", icon: Home },
+  { key: "About", label: "About", icon: User },
+  { key: "Stories", label: "Stories", icon: FileText },
+];
+
   return (
     <div>
-      {/* Header */}
-      <header className="sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-primary-700">Ahelinandy</h1>
-              <nav className="hidden md:flex space-x-1">
-                <Tab
-                  label="Home"
-                  isActive={activeTab === "Home"}
-                  onClick={() => setActiveTab("Home")}
-                />
-                <Tab
-                  label="About"
-                  isActive={activeTab === "About"}
-                  onClick={() => setActiveTab("About")}
-                />
-                <Tab
-                  label="Stories"
-                  isActive={activeTab === "Stories"}
-                  onClick={() => setActiveTab("Stories")}
-                />
-              </nav>
-            </div>
-            <div className="relative">
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="p-2 rounded-full hover:bg-gray-100"
-              >
-                <MoreHorizontal />
-              </button>
+      <div className="flex justify-between items-center h-16">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-2xl font-bold text-primary-700">Ahelinandy</h1>
+          <div className="flex items-center space-x-8 mb-4 border-b border-gray-200 overflow-x-auto">
+  {tabOptions.map(({ key, label, icon: Icon }) => (
+    <button
+      key={key}
+      onClick={() => setActiveTab(key)}
+      className={`flex items-center space-x-2 pb-4 border-b-2 transition-all whitespace-nowrap ${
+        activeTab === key
+          ? "border-primary-600 text-primary-600"
+          : "border-transparent text-gray-600 hover:text-gray-900"
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span className="font-medium">{label}</span>
+    </button>
+  ))}
+</div>
 
-              {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  <button
-                    className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      setShowProfileMenu(false);
-                    }}
-                  >
-                    Copy link to profile
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
-                    onClick={() => {
-                      alert(
-                        "Navigate to design profile (functionality pending)"
-                      );
-                      setShowProfileMenu(false);
-                    }}
-                  >
-                    Design your profile
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
-      </header>
+        <div className="relative">
+          <button
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            className="p-2 rounded-full hover:bg-gray-100"
+          >
+            <MoreHorizontal />
+          </button>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {showProfileMenu && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <button
+                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setShowProfileMenu(false);
+                }}
+              >
+                Copy link to profile
+              </button>
+              <button
+                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                onClick={() => {
+                  alert("Navigate to design profile (functionality pending)");
+                  setShowProfileMenu(false);
+                }}
+              >
+                Design your profile
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="py-8">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Main Content */}
-          <main className="flex-1 max-w-4xl">
+          
             {activeTab === "Home" && (
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center space-x-4">
-                    
-                      <p className="text-gray-500">Reading List</p>
-                    
+                    <p className="text-gray-500">Reading List</p>
                   </div>
                 </div>
 
@@ -245,7 +224,6 @@ const Profile: React.FC = () => {
             {activeTab === "Stories" && (
               <div>
                 <div className="flex items-center justify-between mb-8">
-                  
                   <span className="text-sm text-gray-500">
                     {mockStories.length} stories
                   </span>
@@ -257,7 +235,7 @@ const Profile: React.FC = () => {
                 </div>
               </div>
             )}
-          </main>
+          
 
           {/* Sidebar */}
           <aside className="lg:w-80 xl:w-96">
@@ -280,7 +258,10 @@ const Profile: React.FC = () => {
                   Follow
                 </button>
 
-                <button className="flex items-center justify-center w-full text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors" onClick={() => navigate("/settings")}>
+                <button
+                  className="flex items-center justify-center w-full text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors"
+                  onClick={() => navigate("/settings")}
+                >
                   <Edit2 className="w-4 h-4 mr-2" />
                   Edit profile
                 </button>
@@ -297,8 +278,6 @@ const Profile: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            
           </aside>
         </div>
       </div>
