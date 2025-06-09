@@ -5,12 +5,9 @@ import {
   BookOpen,
   PenTool,
   Users,
-  Settings,
-  BarChart3,
   Building2,
   Shield,
   FileText,
-  Tag,
   LogOut
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
@@ -24,15 +21,15 @@ const Sidebar: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/home', icon: Home, requiresPermission: false },
-    { name: 'My Dashboard', href: '/user-dashboard', icon: BarChart3, requiresPermission: false },
+    // { name: 'My Dashboard', href: '/user-dashboard', icon: BarChart3, requiresPermission: false },
 
-    { name: 'Blogs', href: '/articles', icon: BookOpen, requiresPermission: false },
+    { name: 'Blogs', href: '/blogs', icon: BookOpen, requiresPermission: false },
     { name: 'Create Blogs', href: '/create', icon: PenTool, requiresPermission: false },
     { name: 'Drafts', href: '/drafts', icon: FileText, requiresPermission: false },
     { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: false  },
-    { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
-    { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
-    { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },
+    // { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
+    // { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
+    // { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },
   ];
 
   const shouldShowNavItem = (item: any) => {
@@ -49,7 +46,7 @@ const Sidebar: React.FC = () => {
     <div className="h-screen w-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-800 flex flex-col justify-between items-center py-4 fixed left-0 top-0 z-40 transition-colors">
       {/* Logo */}
       <div className="mb-4">
-        <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center transition-colors">
+        <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center transition-colors">
           <span className="text-xl font-bold text-white">Y</span>
         </div>
       </div>
@@ -65,8 +62,8 @@ const Sidebar: React.FC = () => {
               to={item.href}
               className={`group relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
                 active
-                  ? 'bg-[#1495ff]/30 text-[#1495ff]'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#1495ff] dark:hover:text-white'
+                  ? 'bg-primary-600/30 text-primary-600'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-white'
               }`}
             >
               <Icon className="w-5 h-5" />
@@ -83,7 +80,7 @@ const Sidebar: React.FC = () => {
       {/* User Role Badge & Logout */}
       <div className="flex flex-col items-center gap-3">
         <div className="relative group">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#1495ff] to-[#1495ff] rounded-full flex items-center justify-center transition-colors cursor-pointer hover:scale-105 transform duration-200">
+          <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center transition-colors cursor-pointer hover:scale-105 transform duration-200">
             <Shield className="w-4 h-4 text-white" />
           </div>
           {/* Enhanced Tooltip */}

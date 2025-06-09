@@ -1,657 +1,306 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Edit, 
-  Save, 
-  X, 
-  Shield, 
-  Building2, 
-  Settings,
-  ChevronDown,
-  Users,
-  Crown,
-  UserPlus,
-  Globe,
+import React, { useState } from "react";
+import {
+  User,
+  MoreHorizontal,
   Lock,
   Edit2,
-  CreditCard,
-  CheckCircle2,
-  XCircle,
-  BadgeCheck,
-  Star,
-  Clock,
+  Home,
   FileText,
-  Key
-} from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { mockOrganizations, mockUsers } from '../data/mockData';
-import { format } from 'date-fns';
+  Bookmark,
+  Settings,
+  Heart,
+  MessageCircle,
+  Share2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface OrganizationManagementProps {
-  isOpen: boolean;
-  onToggle: () => void;
+interface TabProps {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
 }
 
-const OrganizationManagement: React.FC<OrganizationManagementProps> = ({ isOpen, onToggle }) => {
-  const { user, organization, switchOrganization } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'settings'>('overview');
+const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
+      isActive
+        ? "text-primary-800 border-primary-800"
+        : "text-gray-500 border-transparent hover:text-primary-800 hover:border-primary-300"
+    }`}
+  >
+    {label}
+  </button>
+);
 
-  const userOrganizations = mockOrganizations.filter(org =>
-    org.ownerId === user?.id || org.members.some(member => member.userId === user?.id)
-  );
-
-  const currentOrgMembers = organization?.members || [];
-
-  if (!isOpen) {
-    return (
-      <button
-        onClick={onToggle}
-        className="flex items-center justify-between w-full p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all"
-      >
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-secondary-500 to-accent-500 rounded-lg flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div className="text-left">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Organization Management</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {organization ? `Managing ${organization.name}` : 'Manage organizations'}
-            </p>
-          </div>
-        </div>
-        <ChevronDown className="w-5 h-5 text-gray-400" />
-      </button>
-    );
-  }
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-secondary-500 to-accent-500 rounded-lg flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Organization Management</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">RBAC & Team Management</p>
-          </div>
-        </div>
-        <button
-          onClick={onToggle}
-          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Organization Selector */}
-      {userOrganizations.length > 1 && (
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Current Organization
-          </label>
-          <select
-            value={organization?.id || ''}
-            onChange={(e) => switchOrganization(e.target.value)}
-            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            {userOrganizations.map(org => (
-              <option key={org.id} value={org.id}>{org.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {organization && (
-        <>
-          {/* Tabs */}
-          <div className="flex border-b border-gray-200 dark:border-gray-700">
-            {[
-              { id: 'overview', label: 'Overview', icon: Globe },
-              { id: 'members', label: 'Members', icon: Users },
-              { id: 'settings', label: 'Settings', icon: Settings },
-            ].map(tab => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-6">
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  {organization.logo ? (
-                    <img
-                      src={organization.logo}
-                      alt={organization.name}
-                      className="w-16 h-16 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-                      <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">{organization.name}</h4>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">{organization.description}</p>
-                    <div className="flex items-center space-x-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
-                      <span>Created {format(new Date(organization.createdAt), 'MMM d, yyyy')}</span>
-                      <span>•</span>
-                      <span>{organization.members.length} members</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
-                    <div className="flex items-center space-x-2">
-                      <Crown className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                      <span className="text-sm font-medium text-primary-700 dark:text-primary-300">Your Role</span>
-                    </div>
-                    <p className="text-lg font-bold text-primary-800 dark:text-primary-200 mt-1 capitalize">
-                      {organization.ownerId === user?.id ? 'Owner' : 'Member'}
-                    </p>
-                  </div>
-                  <div className="bg-accent-50 dark:bg-accent-900/20 rounded-lg p-4">
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-5 h-5 text-accent-600 dark:text-accent-400" />
-                      <span className="text-sm font-medium text-accent-700 dark:text-accent-300">Members</span>
-                    </div>
-                    <p className="text-lg font-bold text-accent-800 dark:text-accent-200 mt-1">
-                      {organization.members.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'members' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Team Members</h4>
-                  {organization.ownerId === user?.id && (
-                    <button className="flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                      <UserPlus className="w-4 h-4" />
-                      <span>Invite Member</span>
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  {currentOrgMembers.map(member => (
-                    <div key={member.userId} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        {member.user.avatar ? (
-                          <img
-                            src={member.user.avatar}
-                            alt={member.user.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-white" />
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{member.user.name}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{member.user.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                          member.role === 'owner' 
-                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                            : member.role === 'admin'
-                            ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
-                            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                        }`}>
-                          {member.role}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'settings' && (
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Organization Settings</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Globe className="w-5 h-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Public Profile</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Make organization visible to public</p>
-                        </div>
-                      </div>
-                      <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-600 transition-colors">
-                        <span className="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Lock className="w-5 h-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Require Approval</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Admin approval required for new content</p>
-                        </div>
-                      </div>
-                      <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-300 dark:bg-gray-600 transition-colors">
-                        <span className="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-1" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {organization.ownerId === user?.id && (
-                  <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <h5 className="text-sm font-medium text-red-600 dark:text-red-400 mb-3">Danger Zone</h5>
-                    <button className="px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-                      Delete Organization
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
-interface UserData {
-  _id: string;
-  username: string;
-  displayName: string;
-  email: string;
-  avatarUrl: string;
-  bio: string;
-  emailVerified: boolean;
-  personalBlogSlug: string;
-  systemRole: string;
-  prodigalCredits: number;
-  royalVenteCredits: number;
-  orgMemberships: Array<{
-    org: string;
-    orgSlug: string;
-    role: string;
-    permissions: {
-      content: {
-        create: boolean;
-        edit: boolean;
-        publish: boolean;
-        delete: boolean;
-        moderate: boolean;
-      };
-      users: {
-        manage: boolean;
-        invite: boolean;
-      };
-      settings: {
-        platform: boolean;
-        organization: boolean;
-      };
-    };
-    _id: string;
-  }>;
-  createdAt: string;
-  verificationExpire: string;
-  verificationToken: string;
+interface StoryCardProps {
+  title: string;
+  excerpt: string;
+  readTime: string;
+  date: string;
+  claps: number;
+  responses: number;
 }
 
-const Profile: React.FC = () => {
-  const { user, organization } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isOrgManagementOpen, setIsOrgManagementOpen] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [editedUser, setEditedUser] = useState({
-    displayName: '',
-    bio: '',
-    avatarUrl: '',
-  });
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/me', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await response.json();
-        setUserData(data.user);
-        setEditedUser({
-          displayName: data.user.displayName,
-          bio: data.user.bio,
-          avatarUrl: data.user.avatarUrl,
-        });
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const handleSave = async () => {
-    try {
-      const response = await fetch('https://royal-vente-blogging-system.onrender.com/api/v1/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(editedUser),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const data = await response.json();
-      setUserData(data.user);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (!userData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
-        <div className="relative mb-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-2xl opacity-90"></div>
-          <div className="relative px-6 py-8 sm:px-8 sm:py-12">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
-              <div className="relative">
-                <div className="h-32 w-32 rounded-full bg-white dark:bg-gray-800 p-1 shadow-xl">
-                  {userData.avatarUrl ? (
-                    <img
-                      src={userData.avatarUrl}
-                      alt={userData.displayName}
-                      className="h-full w-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center">
-                      <User className="h-16 w-16 text-white" />
-                    </div>
-                  )}
-                </div>
-                {userData.emailVerified && (
-                  <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1">
-                    <BadgeCheck className="h-5 w-5 text-white" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold text-white">{userData.displayName}</h1>
-                    <p className="text-primary-100 mt-1">@{userData.username}</p>
-                  </div>
-                  <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-                  >
-                    {isEditing ? <X className="h-5 w-5 mr-2" /> : <Edit className="h-5 w-5 mr-2" />}
-                    {isEditing ? 'Cancel' : 'Edit Profile'}
-                  </button>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-4 justify-center sm:justify-start">
-                  <div className="flex items-center space-x-2 text-primary-100">
-                    <Mail className="h-5 w-5" />
-                    <span>{userData.email}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-primary-100">
-                    <Crown className="h-5 w-5" />
-                    <span className="capitalize">{userData.systemRole}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-primary-100">
-                    <Globe className="h-5 w-5" />
-                    <span>{userData.personalBlogSlug}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+const StoryCard: React.FC<StoryCardProps> = ({
+  title,
+  excerpt,
+  readTime,
+  date,
+  claps,
+  responses,
+}) => (
+  <article className="py-8 border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer group">
+    <div className="flex justify-between items-start gap-8">
+      <div className="flex-1">
+        <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">
+          {title}
+        </h2>
+        <p className="text-gray-600 text-base leading-relaxed mb-4 line-clamp-3">
+          {excerpt}
+        </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-sm text-gray-500 space-x-4">
+            <span>{date}</span>
+            <span>·</span>
+            <span>{readTime} read</span>
           </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Bio Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About</h2>
-              </div>
-              <div className="p-6">
-                {isEditing ? (
-                  <textarea
-                    value={editedUser.bio}
-                    onChange={(e) => setEditedUser({ ...editedUser, bio: e.target.value })}
-                    className="w-full h-32 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                    placeholder="Tell us about yourself..."
-                  />
-                ) : (
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {userData.bio || 'No bio added yet.'}
-                  </p>
-                )}
-              </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-500">
+            <div className="flex items-center space-x-1">
+              <Heart className="w-4 h-4" />
+              <span>{claps}</span>
             </div>
-
-            {/* Account Information */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Account Information</h2>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Verification</p>
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {userData.emailVerified ? 'Verified' : 'Not Verified'}
-                        </p>
-                      </div>
-                    </div>
-                    {userData.emailVerified ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Clock className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</p>
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        {formatDate(userData.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                  {!userData.emailVerified && (
-                    <div className="flex items-center space-x-3">
-                      <Key className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Verification Expires</p>
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {formatDate(userData.verificationExpire)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+            <div className="flex items-center space-x-1">
+              <MessageCircle className="w-4 h-4" />
+              <span>{responses}</span>
             </div>
-
-            {/* Credits Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Credits</h2>
-              </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Prodigal Credits</p>
-                        <p className="text-3xl font-bold text-primary-700 dark:text-primary-300 mt-2">
-                          {userData.prodigalCredits}
-                        </p>
-                      </div>
-                      <CreditCard className="h-8 w-8 text-primary-500" />
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-secondary-900/20 dark:to-secondary-800/20 rounded-xl p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-secondary-600 dark:text-secondary-400">Royal Vente Credits</p>
-                        <p className="text-3xl font-bold text-secondary-700 dark:text-secondary-300 mt-2">
-                          {userData.royalVenteCredits}
-                        </p>
-                      </div>
-                      <Star className="h-8 w-8 text-secondary-500" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Organization Memberships */}
-          <div className="space-y-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Organizations</h2>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  {userData.orgMemberships.map((membership) => (
-                    <div key={membership._id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">{membership.orgSlug}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">Role: {membership.role}</p>
-                        </div>
-                      </div>
-                      <div className="space-y-3">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Permissions</h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(membership.permissions.content).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2 text-sm">
-                                {value ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                ) : (
-                                  <XCircle className="h-4 w-4 text-red-500" />
-                                )}
-                                <span className="text-gray-600 dark:text-gray-400 capitalize">{key}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User Permissions</h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(membership.permissions.users).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2 text-sm">
-                                {value ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                ) : (
-                                  <XCircle className="h-4 w-4 text-red-500" />
-                                )}
-                                <span className="text-gray-600 dark:text-gray-400 capitalize">{key}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Settings Permissions</h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(membership.permissions.settings).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2 text-sm">
-                                {value ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                ) : (
-                                  <XCircle className="h-4 w-4 text-red-500" />
-                                )}
-                                <span className="text-gray-600 dark:text-gray-400 capitalize">{key}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Save Button */}
-        {isEditing && (
-          <div className="fixed bottom-8 right-8">
-            <button
-              onClick={handleSave}
-              className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Save className="h-5 w-5 mr-2" />
-              Save Changes
+            <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+              <Share2 className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+              <Bookmark className="w-4 h-4" />
             </button>
           </div>
-        )}
+        </div>
+      </div>
+      <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0"></div>
+    </div>
+  </article>
+);
 
-        {/* Organization Management */}
-        <OrganizationManagement
-          isOpen={isOrgManagementOpen}
-          onToggle={() => setIsOrgManagementOpen(!isOrgManagementOpen)}
-        />
+const Profile: React.FC = () => {
+  const [activeTab, setActiveTab] = useState("Home");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const mockStories = [
+    {
+      title: "The Art of Minimalist Design in Modern Web Development",
+      excerpt:
+        "Exploring how less can be more when it comes to creating beautiful, functional user interfaces that truly serve their purpose...",
+      readTime: "5 min",
+      date: "Dec 8",
+      claps: 234,
+      responses: 12,
+    },
+    {
+      title: "Understanding React Patterns for Better Code Organization",
+      excerpt:
+        "A deep dive into composition patterns, custom hooks, and architectural decisions that lead to maintainable React applications...",
+      readTime: "8 min",
+      date: "Dec 5",
+      claps: 189,
+      responses: 8,
+    },
+    {
+      title: "The Philosophy of User-Centered Design",
+      excerpt:
+        "Why putting users first isn't just a buzzword, but a fundamental approach that transforms how we think about digital products...",
+      readTime: "6 min",
+      date: "Dec 1",
+      claps: 312,
+      responses: 24,
+    },
+  ];
+
+  return (
+    <div>
+      {/* Header */}
+      <header className="sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-8">
+              <h1 className="text-2xl font-bold text-primary-700">Ahelinandy</h1>
+              <nav className="hidden md:flex space-x-1">
+                <Tab
+                  label="Home"
+                  isActive={activeTab === "Home"}
+                  onClick={() => setActiveTab("Home")}
+                />
+                <Tab
+                  label="About"
+                  isActive={activeTab === "About"}
+                  onClick={() => setActiveTab("About")}
+                />
+                <Tab
+                  label="Stories"
+                  isActive={activeTab === "Stories"}
+                  onClick={() => setActiveTab("Stories")}
+                />
+              </nav>
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <MoreHorizontal />
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <button
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      setShowProfileMenu(false);
+                    }}
+                  >
+                    Copy link to profile
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                    onClick={() => {
+                      alert(
+                        "Navigate to design profile (functionality pending)"
+                      );
+                      setShowProfileMenu(false);
+                    }}
+                  >
+                    Design your profile
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Main Content */}
+          <main className="flex-1 max-w-4xl">
+            {activeTab === "Home" && (
+              <div>
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center space-x-4">
+                    
+                      <p className="text-gray-500">Reading List</p>
+                    
+                  </div>
+                </div>
+
+                <div className="space-y-0">
+                  {mockStories.map((story, index) => (
+                    <StoryCard key={index} {...story} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "About" && (
+              <div>
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-gray-600 leading-relaxed mb-6">
+                    A passionate writer and designer focused on creating
+                    meaningful digital experiences. I write about design,
+                    technology, and the intersection of human behavior with
+                    digital products.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">
+                    When I'm not writing, you can find me exploring new design
+                    patterns, reading about psychology, or experimenting with
+                    creative coding projects.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-8">
+                    {[
+                      "Design",
+                      "Technology",
+                      "User Experience",
+                      "React",
+                      "Web Development",
+                    ].map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "Stories" && (
+              <div>
+                <div className="flex items-center justify-between mb-8">
+                  
+                  <span className="text-sm text-gray-500">
+                    {mockStories.length} stories
+                  </span>
+                </div>
+                <div className="space-y-0">
+                  {mockStories.map((story, index) => (
+                    <StoryCard key={index} {...story} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Sidebar */}
+          <aside className="lg:w-80 xl:w-96">
+            {/* Profile Card */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8 sticky top-24">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-4 border-gray-100">
+                  <img
+                    src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400"
+                    alt="Ahelinandy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  Ahelinandy
+                </h3>
+                <p className="text-gray-500 text-sm mb-4">Writer & Designer</p>
+
+                <button className="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mb-4">
+                  Follow
+                </button>
+
+                <button className="flex items-center justify-center w-full text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors" onClick={() => navigate("/settings")}>
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit profile
+                </button>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Followers</span>
+                  <span className="font-medium text-gray-900">1.2K</span>
+                </div>
+                <div className="flex justify-between text-sm mt-2">
+                  <span className="text-gray-500">Following</span>
+                  <span className="font-medium text-gray-900">324</span>
+                </div>
+              </div>
+            </div>
+
+            
+          </aside>
+        </div>
       </div>
     </div>
   );

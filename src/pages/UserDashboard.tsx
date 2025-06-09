@@ -16,10 +16,11 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { mockPosts, mockOrganizations } from "../data/mockData";
+import { mockPosts } from "../data/mockData";
 import { format } from "date-fns";
 import api from "../utils/axios";
 import OrganizationModal from "../components/OrganizationModal.tsx";
+import Card from "../components/ui/card.tsx";
 
 const UserDashboard = () => {
   const { user: authUser } = useAuth();
@@ -56,14 +57,11 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
-        const response = await api.get(
-          `/orgs/created-by/${authUser._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get(`/orgs/created-by/${authUser._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUserOrgs(response.data);
         setLoading(false);
       } catch (error) {
@@ -74,8 +72,6 @@ const UserDashboard = () => {
 
     fetchOrganizations();
   }, [authUser._id, token]);
-
-  console.log("userOrgs", userOrgs);
 
   // Filter posts and organizations for this user
   const userBlogs = mockPosts.filter(
@@ -93,11 +89,6 @@ const UserDashboard = () => {
     0
   );
 
-  const handleManageOrg = (org) => {
-    setSelectedOrg(org);
-    setIsModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedOrg(null);
@@ -108,8 +99,8 @@ const UserDashboard = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#1495ff] to-[#1495ff] dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
-            Welcome back, {user.name}
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+            Welcome back, {user.displayName}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Manage your content and track your progress
@@ -117,8 +108,8 @@ const UserDashboard = () => {
         </div>
         <div className="flex items-center space-x-3 mt-4 sm:mt-0">
           <Link
-            to="/write"
-            className="flex items-center space-x-2 bg-[#1495ff] dark:bg-[#1495ff] text-white px-6 py-3 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all transform hover:scale-105 shadow-lg"
+            to="/create"
+            className="flex items-center space-x-2 bg-primary-600 dark:bg-primary-600 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105 shadow-lg"
           >
             <Plus className="w-4 h-4" />
             <span>New Blog</span>
@@ -146,7 +137,7 @@ const UserDashboard = () => {
             onClick={() => setActiveTab(key)}
             className={`flex items-center space-x-2 pb-4 border-b-2 transition-all whitespace-nowrap ${
               activeTab === key
-                ? "border-[#1495ff] text-[#1495ff]"
+                ? "border-primary-600 text-primary-600"
                 : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
             }`}
           >
@@ -183,7 +174,7 @@ const UserDashboard = () => {
               title="Organizations"
               value={userOrgs?.data?.length || 0}
               icon={<Building2 className="w-6 h-6 text-orange-600" />}
-              from="red"
+              from="orange"
             />
           </div>
 
@@ -207,7 +198,13 @@ const UserDashboard = () => {
 
       {/* Organizations Tab */}
       {activeTab === "organizations" && (
-        <OrgSection orgs={userOrgs.data} userId={user.id} onManage={handleManageOrg} />
+        <>
+          {loading ? (
+            <OrgSkeleton />
+          ) : (
+            <OrgSection orgs={userOrgs?.data || []} userId={user.id} />
+          )}
+        </>
       )}
 
       {/* Analytics Tab */}
@@ -237,35 +234,6 @@ const UserDashboard = () => {
 };
 
 /** Reusable components below **/
-
-const Card: React.FC<{
-  title: string;
-  value: number | string;
-  icon: ReactNode;
-  from: string;
-}> = ({ title, value, icon, from }) => (
-  <div
-    className={`bg-gradient-to-br from-${from}-50 to-${from}-100 dark:from-${from}-900/20 dark:to-${from}-800/20 rounded-xl shadow-sm border border-${from}-200 dark:border-${from}-800 p-6`}
-  >
-    <div className="flex items-center justify-between">
-      <div>
-        <p
-          className={`text-sm font-medium text-${from}-600 dark:text-${from}-400`}
-        >
-          {title}
-        </p>
-        <p
-          className={`text-3xl font-bold text-${from}-700 dark:text-${from}-300`}
-        >
-          {value}
-        </p>
-      </div>
-      <div className={`p-3 bg-${from}-200 dark:bg-${from}-800 rounded-lg`}>
-        {icon}
-      </div>
-    </div>
-  </div>
-);
 
 const RecentBlogs = ({ title, posts }: any) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -298,7 +266,7 @@ const RecentBlogs = ({ title, posts }: any) => (
           </div>
           <Link
             to={`/blog/${post.id}`}
-            className="p-2 text-gray-400 hover:text-[#1495ff] transition-colors"
+            className="p-2 text-gray-400 hover:text-primary-600 transition-colors"
           >
             <Eye className="w-4 h-4" />
           </Link>
@@ -317,9 +285,7 @@ const QuickActions = () => (
       {[
         {
           to: "/write",
-          icon: (
-            <Plus className="w-4 h-4 text-[#1495ff] dark:text-[#1495ff]" />
-          ),
+          icon: <Plus className="w-4 h-4 text-primary-600 dark:text-primary-600" />,
           title: "Write New Blog",
           subtitle: "Share your thoughts with the world",
         },
@@ -335,9 +301,9 @@ const QuickActions = () => (
         <Link
           key={to}
           to={to}
-          className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-[#1495ff] dark:hover:bg-[#1495ff]/20 transition-all"
+          className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-primary-600 dark:hover:bg-primary-600/20 transition-all"
         >
-          <div className="p-2 bg-[#1495ff] dark:bg-[#1495ff]/90 rounded-lg">
+          <div className="p-2 bg-primary-600 dark:bg-primary-600/90 rounded-lg">
             {icon}
           </div>
           <div>
@@ -378,7 +344,7 @@ const Section = ({ title, items, draft }) => (
                     : `Published ${format(
                         new Date(item.createdAt),
                         "MMM d, yyyy"
-                      )} • ${(item.readTime ?? 5)} min read`}
+                      )} • ${item.readTime ?? 5} min read`}
                 </p>
                 {draft && item.excerpt && (
                   <p className="text-gray-700 dark:text-gray-300 line-clamp-2">
@@ -405,7 +371,7 @@ const Section = ({ title, items, draft }) => (
               <div className="flex items-center space-x-2 ml-4">
                 <Link
                   to={draft ? `/write?draft=${item.id}` : `/blog/${item.id}`}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-[#1495ff] dark:hover:text-[#1495ff] transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-600 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   title={draft ? "Edit" : "View"}
                 >
                   {draft ? (
@@ -440,7 +406,7 @@ const Section = ({ title, items, draft }) => (
         </p>
         <Link
           to="/write"
-          className="inline-flex items-center space-x-2 bg-[#1495ff] dark:bg-[#1495ff] text-white px-6 py-3 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all transform hover:scale-105"
+          className="inline-flex items-center space-x-2 bg-primary-600 dark:bg-primary-600 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105"
         >
           <Plus className="w-4 h-4" />
           <span>{draft ? "New Draft" : "Write your first blog"}</span>
@@ -450,20 +416,45 @@ const Section = ({ title, items, draft }) => (
   </div>
 );
 
-const OrgSection = ({ orgs, userId, onManage }) => (
+type OrgSectionProps = {
+  orgs: Array<any>;
+  userId: string;
+};
+
+const OrgSection = ({ orgs, userId }: OrgSectionProps) => (
   <div>
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
       My Organizations
     </h2>
-    {orgs.length > 0 ? (
+    {orgs?.length > 0 ? (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {orgs.map((org) => {
-          const userMembership = org.members.find(
-            (orgs) => orgs.user.id === userId
-          );
+          interface OrgMember {
+            user: {
+              id: string;
+              name: string;
+              email?: string;
+              avatar?: string;
+            };
+            role: string;
+          }
+
+          interface Organization {
+            id: string;
+            name: string;
+            logo?: string;
+            description?: string;
+            articlesCount: number;
+            members: OrgMember[];
+          }
+
+          const userMembership: OrgMember | undefined = (
+            org as Organization
+          ).members.find((orgs: OrgMember) => orgs.user.id === userId);
+
           return (
             <div
-              key={org.id}
+              key={org._id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200 transform hover:scale-105"
             >
               <div className="flex items-center space-x-3 mb-4">
@@ -478,7 +469,7 @@ const OrgSection = ({ orgs, userId, onManage }) => (
                   <h3 className="font-semibold text-gray-900 dark:text-white">
                     {org.name}
                   </h3>
-                  <span className="px-2 py-1 bg-[#1495ff] dark:bg-[#1495ff] text-[#fff] dark:text-[#fff] text-xs rounded-full capitalize">
+                  <span className="px-2 py-1 bg-primary-600 dark:bg-primary-600 text-[#fff] dark:text-[#fff] text-xs rounded-full capitalize">
                     {userMembership?.role}
                   </span>
                 </div>
@@ -501,15 +492,13 @@ const OrgSection = ({ orgs, userId, onManage }) => (
 
               {userMembership?.role === "owner" && (
                 <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => onManage(org)}
-                    className="flex-1 bg-gradient-to-r from-[#1495ff] to-[#1495ff] text-white px-3 py-2 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all duration-200 text-sm"
+                  <Link
+                    to={`/admin/organization/${org._id}/manage`}
+                    state={{ organization: org }}
+                    className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-3 py-2 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 text-sm justify-center flex w-full"
                   >
                     Manage
-                  </button>
-                  <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-[#1495ff] dark:hover:text-[#1495ff] transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <Users className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -527,7 +516,7 @@ const OrgSection = ({ orgs, userId, onManage }) => (
         </p>
         <Link
           to="/create-organization"
-          className="inline-flex items-center space-x-2 bg-gradient-to-r from-[#1495ff] to-[#1495ff] text-white px-6 py-3 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all duration-200 transform hover:scale-105"
+          className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 transform hover:scale-105"
         >
           <Building2 className="w-4 h-4" />
           <span>Create an organization</span>
@@ -543,7 +532,7 @@ const Analytics = ({ totalLikes, avgReadTime, pubRate }) => (
       <Metric
         title="Total Engagement"
         value={totalLikes}
-        icon={<TrendingUp className="w-5 h-5 text-[#1495ff]" />}
+        icon={<TrendingUp className="w-5 h-5 text-primary-600" />}
         change="+12% from last month"
       />
       <Metric
@@ -574,10 +563,8 @@ const Analytics = ({ totalLikes, avgReadTime, pubRate }) => (
               key={post.id}
               className="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              <div className="flex-shrink-0 w-8 h-8 bg-[#1495ff] dark:bg-[#1495ff] rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-white">
-                  #{i + 1}
-                </span>
+              <div className="flex-shrink-0 w-8 h-8 bg-primary-600 dark:bg-primary-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-bold text-white">#{i + 1}</span>
               </div>
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900 dark:text-white line-clamp-1">
@@ -600,7 +587,7 @@ const Analytics = ({ totalLikes, avgReadTime, pubRate }) => (
               </div>
               <Link
                 to={`/blog/${post.id}`}
-                className="p-2 text-gray-400 hover:text-[#1495ff] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-2 text-gray-400 hover:text-primary-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <Eye className="w-4 h-4" />
               </Link>
@@ -619,8 +606,33 @@ const Metric = ({ title, value, icon, change }) => (
       </h3>
       {icon}
     </div>
-    <p className="text-3xl font-bold text-[#1495ff] mb-2">{value}</p>
+    <p className="text-3xl font-bold text-primary-600 mb-2">{value}</p>
     <p className="text-sm text-gray-500 dark:text-gray-400">{change}</p>
+  </div>
+);
+
+const OrgSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <div
+        key={i}
+        className="animate-pulse bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+      >
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+          <div className="space-y-2 flex-1">
+            <div className="w-3/4 h-4 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="w-1/4 h-3 bg-gray-300 dark:bg-gray-700 rounded" />
+          </div>
+        </div>
+        <div className="w-full h-3 bg-gray-300 dark:bg-gray-700 rounded mb-4" />
+        <div className="w-full h-3 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+        <div className="flex items-center justify-between">
+          <div className="w-1/3 h-3 bg-gray-300 dark:bg-gray-700 rounded" />
+          <div className="w-1/3 h-3 bg-gray-300 dark:bg-gray-700 rounded" />
+        </div>
+      </div>
+    ))}
   </div>
 );
 

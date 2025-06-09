@@ -97,10 +97,12 @@ const Drafts: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Drafts</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Continue working on your unpublished articles
-          </p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+              My Drafts
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Continue working on your unpublished articles
+            </p>
         </div>
         <div className="mt-4 md:mt-0">
           <Link

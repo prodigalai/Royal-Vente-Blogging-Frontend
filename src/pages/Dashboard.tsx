@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight,
@@ -18,6 +18,17 @@ const featuredArticle = mockArticles[0];
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('featured');
+  const [currentIndex, setCurrentIndex] = useState(0);
+const featuredArticles = mockArticles.slice(0, 5); // or however many you want to rotate
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % featuredArticles.length);
+  }, 3000); // change slide every 5 seconds
+
+  return () => clearInterval(interval); // cleanup on unmount
+}, [featuredArticles.length]);
+
 
   const otherArticles = mockArticles.slice(1);
 
@@ -39,10 +50,10 @@ const UserDashboard: React.FC = () => {
         {/* Featured Article */}
         <section className="mb-12">
           <div className="flex items-center space-x-2 mb-6">
-            <Star className="w-5 h-5 text-[#1495ff]" />
+            <Star className="w-5 h-5 text-primary-600" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Featured Story</h2>
           </div>
-          <ArticleCard article={featuredArticle} variant="featured" />
+          <ArticleCard article={featuredArticles[currentIndex]} variant="featured" />
         </section>
 
         {/* Article Tabs */}
@@ -58,7 +69,7 @@ const UserDashboard: React.FC = () => {
                 onClick={() => setActiveTab(key as any)}
                 className={`flex items-center space-x-2 pb-4 border-b-2 transition-all duration-200 ${
                   activeTab === key
-                    ? 'border-[#1495ff] text-[#1495ff]'
+                    ? 'border-primary-600 text-primary-600'
                     : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
@@ -82,7 +93,7 @@ const UserDashboard: React.FC = () => {
           {/* Trending Topics */}
           <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-[#1495ff]" />
+              <TrendingUp className="w-5 h-5 text-primary-600" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Trending Topics</h3>
             </div>
             <div className="space-y-3">
@@ -93,7 +104,7 @@ const UserDashboard: React.FC = () => {
                   className="block group p-3 rounded-lg hover:bg-white dark:hover:bg-gray-600 transition-all duration-200"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-700 dark:text-gray-300 group-hover:text-[#1495ff] dark:group-hover:text-[#1495ff] font-medium transition-colors">
+                    <span className="text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-600 font-medium transition-colors">
                       {tag.name}
                     </span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -108,7 +119,7 @@ const UserDashboard: React.FC = () => {
             </div>
             <Link
               to="/tags"
-              className="inline-flex items-center space-x-1 text-[#1495ff] hover:text-[#1495ff] dark:text-[#1495ff] dark:hover:text-[#1495ff] font-medium mt-4 transition-colors"
+              className="inline-flex items-center space-x-1 text-primary-600 hover:text-primary-600 dark:text-primary-600 dark:hover:text-primary-600 font-medium mt-4 transition-colors"
             >
               <span>See all topics</span>
               <ArrowRight className="w-4 h-4" />
@@ -118,7 +129,7 @@ const UserDashboard: React.FC = () => {
           {/* Featured Organizations */}
           <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
             <div className="flex items-center space-x-2 mb-4">
-              <Building2 className="w-5 h-5 text-[#1495ff]" />
+              <Building2 className="w-5 h-5 text-primary-600" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Featured Organizations</h3>
             </div>
             <div className="space-y-4">
@@ -133,7 +144,7 @@ const UserDashboard: React.FC = () => {
                       />
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-[#1495ff] dark:group-hover:text-[#1495ff] transition-colors">
+                      <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-600 transition-colors">
                         {org.name}
                       </h4>
                       <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">

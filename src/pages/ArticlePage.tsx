@@ -54,7 +54,7 @@ const ArticlePage = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Link
-          to="/articles"
+          to="/blogs"
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-emerald-600 mb-6 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />

@@ -84,7 +84,7 @@ const CreateOrganization: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
         <div className="flex items-center space-x-3 mb-8">
-          <div className="p-3 bg-gradient-to-br from-[#1495ff] to-[#1495ff] dark:from-[#1495ff] dark:to-[#1495ff] rounded-xl">
+          <div className="p-3 bg-gradient-to-br from-primary-600 to-primary-700 dark:from-primary-600 dark:to-primary-700 rounded-xl">
             <Building2 className="w-6 h-6 text-[#fff] dark:text-[#fff]" />
           </div>
           <div>
@@ -114,7 +114,7 @@ const CreateOrganization: React.FC = () => {
                 required
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1495ff] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
                 placeholder="Enter organization name"
               />
             </div>
@@ -130,7 +130,7 @@ const CreateOrganization: React.FC = () => {
                 rows={4}
                 value={formData.description}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1495ff] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
                 placeholder="Describe your organization's mission and goals"
               />
             </div>
@@ -174,7 +174,7 @@ const CreateOrganization: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || !formData.name.trim() || !formData.description.trim()}
-              className="flex items-center space-x-2 bg-gradient-to-r from-[#1495ff] to-[#1495ff] text-white px-6 py-3 rounded-lg hover:from-[#1495ff] hover:to-[#1495ff] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -201,7 +201,7 @@ const CreateOrganization: React.FC = () => {
               {/* Button to choose picture */}
               <button
                 onClick={() => document.getElementById('fileInput')?.click()}
-                className="w-full bg-[#1495ff] text-white py-3 rounded-lg hover:bg-[#1495ff] transition-all duration-200"
+                className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-600 transition-all duration-200"
               >
                 Choose Picture
               </button>
