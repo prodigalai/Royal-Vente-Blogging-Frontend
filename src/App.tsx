@@ -25,6 +25,12 @@ import UserManagement from './pages/UserManagement';
 import UserDashboard from './pages/UserDashboard';
 import CreateOrganization from './pages/CreateOrganization';
 import OrganizationManage from './pages/admin/OrganizationManage';
+import { NotificationsPage } from './pages/Notifications';
+import { UserLayout } from './components/Layout/UserLayout';
+import { LibraryPage } from './pages/LibraryPage';
+import { SettingsLayout } from './components/Layout/SettingsLayout';
+import { UserDetailsLayout } from './components/Layout/UserDetailsLayout';
+import FollowDetailPage from './pages/FollowDetailPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -127,22 +133,45 @@ const AppRoutes: React.FC = () => {
         path="/profile"
         element={
           <ProtectedRoute>
-            <MainLayout />
+            <UserDetailsLayout />
           </ProtectedRoute>
         }
       >
         <Route index element={<Profile />} />
+        <Route path='following' element={<FollowDetailPage />} />
       </Route>
       
       <Route
         path="/settings"
         element={
           <ProtectedRoute>
-            <MainLayout />
+            <SettingsLayout />
           </ProtectedRoute>
         }
       >
         <Route index element={<Settings />} />
+      </Route>
+
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<NotificationsPage />} />
+      </Route>
+
+      <Route
+        path="/library"
+        element={
+          <ProtectedRoute>
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<LibraryPage />} />
       </Route>
 
       <Route path='/create-organization' element={
@@ -153,6 +182,9 @@ const AppRoutes: React.FC = () => {
         <Route index element={<CreateOrganization />} />
       </Route>
 
+      
+
+      {/* User Dashboard */}
       {/* Admin Routes */}
       <Route
         path="/admin/*"
@@ -164,8 +196,6 @@ const AppRoutes: React.FC = () => {
       >
         <Route path="users" element={<UserManagement />} />
         <Route path="organization/:orgId/manage" element={<OrganizationManage />} />
-        <Route path="settings" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Settings</h1></div>} />
-        <Route path="security" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Security Settings</h1></div>} />
         <Route index element={<Navigate to="/admin/users" replace />} />
       </Route>
 
