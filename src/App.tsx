@@ -24,9 +24,8 @@ import ArticlePage from './pages/ArticlePage'; // Ensure you import your Article
 import UserManagement from './pages/UserManagement';
 import UserDashboard from './pages/UserDashboard';
 import CreateOrganization from './pages/CreateOrganization';
-import UserOrganizations from './pages/UserOrganizations';
+import OrganizationManage from './pages/admin/OrganizationManage';
 import OrganizationPage from './pages/OrganizationPage';
-
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -71,7 +70,7 @@ const AppRoutes: React.FC = () => {
       </Route>
       
       <Route
-        path="/articles"
+        path="/blogs"
         element={
           <ProtectedRoute>
             <MainLayout />
@@ -175,9 +174,7 @@ const AppRoutes: React.FC = () => {
       >
         
         <Route path="users" element={<UserManagement />} />
-        <Route path="organizations" element={<UserOrganizations /> } />
-  
-
+        <Route path="organization/:orgId/manage" element={<OrganizationManage />} />
         <Route path="settings" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Settings</h1></div>} />
         <Route path="security" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Security Settings</h1></div>} />
         <Route index element={<Navigate to="/admin/users" replace />} />
