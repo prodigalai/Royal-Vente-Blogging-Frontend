@@ -1,285 +1,317 @@
 import React, { useState } from "react";
 import {
-  User,
   MoreHorizontal,
   Lock,
-  Edit2,
-  Home,
-  FileText,
   Bookmark,
-  Settings,
-  Heart,
   MessageCircle,
-  Share2,
+  Heart as ClapIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+// —————— Dummy user and content data ——————
+const user = {
+  name: "Ashwini Balasaheb Nargarboje",
+  avatar: "https://i.pravatar.cc/100?u=ashwini",
+  cover: "https://picsum.photos/seed/cover/1200/300",
+  bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
+  followers: 124,
+  following: 56,
+};
 
-interface StoryCardProps {
-  title: string;
-  excerpt: string;
-  readTime: string;
-  date: string;
-  claps: number;
-  responses: number;
-}
-
-const StoryCard: React.FC<StoryCardProps> = ({
-  title,
-  excerpt,
-  readTime,
-  date,
-  claps,
-  responses,
-}) => (
-  <article className="py-8 border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer group">
-    <div className="flex justify-between items-start gap-8">
-      <div className="flex-1">
-        <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">
-          {title}
-        </h2>
-        <p className="text-gray-600 text-base leading-relaxed mb-4 line-clamp-3">
-          {excerpt}
-        </p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-sm text-gray-500 space-x-4">
-            <span>{date}</span>
-            <span>·</span>
-            <span>{readTime} read</span>
-          </div>
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center space-x-1">
-              <Heart className="w-4 h-4" />
-              <span>{claps}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <MessageCircle className="w-4 h-4" />
-              <span>{responses}</span>
-            </div>
-            <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-              <Share2 className="w-4 h-4" />
-            </button>
-            <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-              <Bookmark className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0"></div>
-    </div>
-  </article>
-);
-
-const Profile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("Home");
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const navigate = useNavigate();
-
-  const mockStories = [
-    {
-      title: "The Art of Minimalist Design in Modern Web Development",
-      excerpt:
-        "Exploring how less can be more when it comes to creating beautiful, functional user interfaces that truly serve their purpose...",
-      readTime: "5 min",
-      date: "Dec 8",
-      claps: 234,
-      responses: 12,
-    },
-    {
-      title: "Understanding React Patterns for Better Code Organization",
-      excerpt:
-        "A deep dive into composition patterns, custom hooks, and architectural decisions that lead to maintainable React applications...",
-      readTime: "8 min",
-      date: "Dec 5",
-      claps: 189,
-      responses: 8,
-    },
-    {
-      title: "The Philosophy of User-Centered Design",
-      excerpt:
-        "Why putting users first isn't just a buzzword, but a fundamental approach that transforms how we think about digital products...",
-      readTime: "6 min",
-      date: "Dec 1",
-      claps: 312,
-      responses: 24,
-    },
-  ];
-
-  const tabOptions = [
-  { key: "Home", label: "Home", icon: Home },
-  { key: "About", label: "About", icon: User },
-  { key: "Stories", label: "Stories", icon: FileText },
+const dummyLists = [
+  {
+    id: 1,
+    name: "Reading list",
+    count: 4,
+    covers: [
+      "https://picsum.photos/seed/rl1/100/100",
+      "https://picsum.photos/seed/rl2/100/100",
+      "https://picsum.photos/seed/rl3/100/100",
+    ],
+  },
+  {
+    id: 2,
+    name: "Tech Reads",
+    count: 8,
+    covers: [
+      "https://picsum.photos/seed/tr1/100/100",
+      "https://picsum.photos/seed/tr2/100/100",
+      "https://picsum.photos/seed/tr3/100/100",
+    ],
+  },
 ];
 
-  return (
-    <div>
-      <div className="flex justify-between items-center h-16">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-2xl font-bold text-primary-700">Ahelinandy</h1>
-          <div className="flex items-center space-x-8 mb-4 border-b border-gray-200 overflow-x-auto">
-  {tabOptions.map(({ key, label, icon: Icon }) => (
-    <button
-      key={key}
-      onClick={() => setActiveTab(key)}
-      className={`flex items-center space-x-2 pb-4 border-b-2 transition-all whitespace-nowrap ${
-        activeTab === key
-          ? "border-primary-600 text-primary-600"
-          : "border-transparent text-gray-600 hover:text-gray-900"
-      }`}
-    >
-      <Icon className="w-4 h-4" />
-      <span className="font-medium">{label}</span>
-    </button>
-  ))}
-</div>
+const dummyStories = [
+  {
+    id: 1,
+    title: "31 Photos From September 11th That You Have Never Seen",
+    author: "Jeremiah Warren",
+    authorAvatar: "https://i.pravatar.cc/40?img=5",
+    date: "Sep 10, 2012",
+    claps: 53000,
+    comments: 674,
+    excerpt:
+      "In 2001, digital cameras were a rare commodity. They were expensive, bulky and captured images that were inferior to the…",
+    cover: "https://picsum.photos/seed/september11/400/200",
+  },
+  {
+    id: 2,
+    title: "Building a Real-time Candlestick Chart in React",
+    author: "Jane Doe",
+    authorAvatar: "https://i.pravatar.cc/40?img=2",
+    date: "Jun 10, 2025",
+    claps: 1200,
+    comments: 45,
+    excerpt:
+      "Step-by-step guide to implement live-updating financial charts using ApexCharts and WebSockets.",
+    cover: "https://picsum.photos/seed/chart/400/200",
+  },
+  {
+    id: 3,
+    title: "Implementing Secure ONDC API Signatures",
+    author: "Alice Smith",
+    authorAvatar: "https://i.pravatar.cc/40?img=3",
+    date: "May 28, 2025",
+    claps: 850,
+    comments: 30,
+    excerpt:
+      "Learn to sign and verify Beckn-based payloads for ONDC integrations in Node.js.",
+    cover: "https://picsum.photos/seed/ondc/400/200",
+  },
+];
 
+const Profile: React.FC = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"Stories" | "Lists" | "About">(
+    "Stories"
+  );
+  const [showMenu, setShowMenu] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [bioText, setBioText] = useState(user.bio);
+
+  const copyProfileLink = () => {
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+    }
+    setShowMenu(false);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-8 lg:px-16">
+      {/* Cover + Avatar */}
+      <div className="relative">
+        <img
+          src={user.cover}
+          alt="Cover"
+          className="w-full h-48 object-cover rounded-b-lg"
+        />
+        <div className="absolute -bottom-12 left-8">
+          <img
+            src={user.avatar}
+            alt="Avatar"
+            className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800"
+          />
+        </div>
+      </div>
+
+      {/* Header */}
+      <div className="flex items-center justify-between mt-16 px-8">
+        <div>
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
+            {user.name}
+          </h1>
+          <div className="flex items-center space-x-6 mt-2 text-gray-600 dark:text-gray-400">
+            <span
+              className="cursor-pointer hover:underline"
+              onClick={() => navigate("/profile/followers")}
+            >
+              {user.followers} followers
+            </span>
+            <span
+              className="cursor-pointer hover:underline"
+              onClick={() => navigate("/profile/following")}
+            >
+              {user.following} following
+            </span>
+          </div>
         </div>
         <div className="relative">
           <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="p-2 rounded-full hover:bg-gray-100"
+            onClick={() => setShowMenu((s) => !s)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <MoreHorizontal />
+            <MoreHorizontal className="w-6 h-6 text-gray-600 dark:text-gray-300" />
           </button>
-
-          {showProfileMenu && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
               <button
-                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setShowProfileMenu(false);
-                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={copyProfileLink}
               >
                 Copy link to profile
               </button>
               <button
-                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
-                onClick={() => {
-                  alert("Navigate to design profile (functionality pending)");
-                  setShowProfileMenu(false);
-                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => setShowMenu(false)}
               >
-                Design your profile
+                Edit profile
               </button>
             </div>
           )}
         </div>
       </div>
 
-      <div className="py-8">
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Main Content */}
-          
-            {activeTab === "Home" && (
-              <div>
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center space-x-4">
-                    <p className="text-gray-500">Reading List</p>
-                  </div>
-                </div>
+      {/* Tabs */}
+      <div className="px-8 mt-8 border-b border-gray-200 dark:border-gray-700">
+        <nav className="flex space-x-8">
+          {["Stories", "Lists", "About"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab as any)}
+              className={`pb-3 border-b-2 transition-all whitespace-nowrap font-medium text-sm ${
+                activeTab === tab
+                  ? "border-primary-600 text-primary-600"
+                  : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+      </div>
 
-                <div className="space-y-0">
-                  {mockStories.map((story, index) => (
-                    <StoryCard key={index} {...story} />
+      {/* Content */}
+      <div className="px-8 py-12 space-y-8">
+        {activeTab === "Lists" && (
+          <div className="grid gap-8 md:grid-cols-2">
+            {dummyLists.map((list) => (
+              <div
+                key={list.id}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={user.avatar}
+                      alt="owner"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {user.name}
+                    </span>
+                  </div>
+                  <MoreHorizontal className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </div>
+                <h2 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
+                  {list.name}
+                </h2>
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <span>{list.count} stories</span>
+                  <Lock className="w-4 h-4 ml-2" />
+                </div>
+                <div className="flex -space-x-2 mt-4">
+                  {list.covers.map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`cover-${i}`}
+                      className="w-12 h-12 object-cover rounded-lg border-2 border-white dark:border-gray-800"
+                    />
                   ))}
                 </div>
               </div>
-            )}
+            ))}
+          </div>
+        )}
 
-            {activeTab === "About" && (
-              <div>
-                <div className="prose prose-lg max-w-none">
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    A passionate writer and designer focused on creating
-                    meaningful digital experiences. I write about design,
-                    technology, and the intersection of human behavior with
-                    digital products.
+        {activeTab === "Stories" && (
+          <div className="space-y-6">
+            {dummyStories.map((s) => (
+              <div
+                key={s.id}
+                className="flex flex-col md:flex-row border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="flex-1 p-6">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <img
+                      src={s.authorAvatar}
+                      alt={s.author}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {s.author}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    {s.title}
+                  </h3>
+                  <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
+                    {s.excerpt}
                   </p>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    When I'm not writing, you can find me exploring new design
-                    patterns, reading about psychology, or experimenting with
-                    creative coding projects.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-8">
-                    {[
-                      "Design",
-                      "Technology",
-                      "User Experience",
-                      "React",
-                      "Web Development",
-                    ].map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-500 mb-4">
+                    <span>{s.date}</span>
+                    <span>·</span>
+                    <span>{s.claps.toLocaleString()} claps</span>
+                    <span>·</span>
+                    <span>{s.comments} comments</span>
+                  </div>
+                  <div className="flex items-center space-x-6 text-gray-600 dark:text-gray-400">
+                    <Bookmark className="w-5 h-5 hover:text-gray-900 dark:hover:text-white cursor-pointer" />
+                    <MessageCircle className="w-5 h-5 hover:text-gray-900 dark:hover:text-white cursor-pointer" />
+                    <ClapIcon className="w-5 h-5 hover:text-gray-900 dark:hover:text-white cursor-pointer" />
+                    <MoreHorizontal className="w-5 h-5 hover:text-gray-900 dark:hover:text-white cursor-pointer" />
                   </div>
                 </div>
+                <img
+                  src={s.cover}
+                  alt={s.title}
+                  className="w-full md:w-48 h-40 object-cover"
+                />
               </div>
-            )}
+            ))}
+          </div>
+        )}
 
-            {activeTab === "Stories" && (
-              <div>
-                <div className="flex items-center justify-between mb-8">
-                  <span className="text-sm text-gray-500">
-                    {mockStories.length} stories
-                  </span>
-                </div>
-                <div className="space-y-0">
-                  {mockStories.map((story, index) => (
-                    <StoryCard key={index} {...story} />
-                  ))}
-                </div>
-              </div>
-            )}
-          
-
-          {/* Sidebar */}
-          <aside className="lg:w-80 xl:w-96">
-            {/* Profile Card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8 sticky top-24">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-4 border-gray-100">
-                  <img
-                    src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400"
-                    alt="Ahelinandy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                  Ahelinandy
-                </h3>
-                <p className="text-gray-500 text-sm mb-4">Writer & Designer</p>
-
-                <button className="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mb-4">
-                  Follow
-                </button>
-
+        {activeTab === "About" && (
+          <div className="max-w-2xl">
+            {!isEditing ? (
+              <>
+                <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {bioText}
+                </p>
                 <button
-                  className="flex items-center justify-center w-full text-primary-600 hover:text-primary-700 text-sm font-medium transition-colors"
-                  onClick={() => navigate("/settings")}
+                  onClick={() => setIsEditing(true)}
+                  className="mt-6 px-5 py-2 border border-primary-600 text-primary-600 rounded-full hover:bg-primary-600 hover:text-white transition-colors text-sm"
                 >
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Edit profile
+                  Edit bio
                 </button>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Followers</span>
-                  <span className="font-medium text-gray-900">1.2K</span>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <textarea
+                  value={bioText}
+                  onChange={(e) => setBioText(e.target.value)}
+                  rows={6}
+                  className="w-full resize-none border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none"
+                />
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-full text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 border border-primary-600 text-primary-600 rounded-full hover:bg-primary-600 hover:text-white transition-colors text-sm"
+                  >
+                    Save
+                  </button>
                 </div>
-                <div className="flex justify-between text-sm mt-2">
-                  <span className="text-gray-500">Following</span>
-                  <span className="font-medium text-gray-900">324</span>
-                </div>
               </div>
-            </div>
-          </aside>
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

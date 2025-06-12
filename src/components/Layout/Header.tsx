@@ -11,6 +11,8 @@ import {
   Building2,
   PenTool,
   BarChart3,
+  Bell,
+  Bookmark,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -69,6 +71,8 @@ const Header: React.FC = () => {
               <PenTool className="w-4 h-4" />
               <span>Write</span>
             </Link>
+
+
             <button
               onClick={toggleTheme}
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all hover:scale-105"
@@ -79,6 +83,13 @@ const Header: React.FC = () => {
                 <Sun className="w-5 h-5" />
               )}
             </button>
+
+              <Link 
+              to={"/notifications"}
+              className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-700 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                </Link>
 
             {/* Organization Info */}
             {organization && (
@@ -165,6 +176,15 @@ const Header: React.FC = () => {
                   >
                     <Building2 className="w-4 h-4" />
                     <span>Create Organization</span>
+                  </Link>
+
+                  <Link
+                    to="/library"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    <span>My Library</span>
                   </Link>
 
                   <Link

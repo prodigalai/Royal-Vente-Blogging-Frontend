@@ -8,11 +8,11 @@ interface EditorToolbarProps {
   isSaving?: boolean
 }
 
-export const EditorToolbar: React.FC<EditorToolbarProps> = ({ 
-  onPublish, 
-  onSave, 
-  isDraft, 
-  isSaving = false 
+export const EditorToolbar: React.FC<EditorToolbarProps> = ({
+  onPublish,
+  onSave,
+  isDraft,
+  isSaving = false,
 }) => {
   return (
     <div className="w-full flex items-center justify-between py-4 px-6 border-b border-gray-200 sticky top-0 bg-white z-30">
@@ -24,26 +24,26 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </span>
         )}
       </div>
-      
+
       <div className="flex items-center space-x-3">
         {onSave && (
           <button
             onClick={onSave}
             disabled={isSaving}
-            className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-4 py-2 text-[#00ab6c] hover:bg-[#f0fdf8] rounded-lg transition-colors disabled:opacity-50"
           >
             <Save size={16} />
             <span>{isSaving ? "Saving..." : "Save"}</span>
           </button>
         )}
-        
+
         <button
           onClick={onPublish}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors"
+          className="bg-[#00ab6c] hover:bg-[#009f61] text-white px-6 py-2 rounded-full text-sm font-medium transition-colors"
         >
           {isDraft ? "Publish" : "Update"}
         </button>
-        
+
         <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
           <MoreHorizontal size={20} className="text-gray-600" />
         </button>

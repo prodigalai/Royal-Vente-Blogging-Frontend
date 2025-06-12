@@ -35,7 +35,7 @@ useEffect(() => {
   const getTabArticles = () => {
     switch (activeTab) {
       case 'recent':
-        return [...mockArticles].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+        return [...mockArticles].sort((a, b) => b?.publishedAt?.getTime() - a?.publishedAt?.getTime());
       case 'trending':
         return [...mockArticles].sort((a, b) => b.likes - a.likes);
       default:

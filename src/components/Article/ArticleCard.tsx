@@ -167,8 +167,9 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   }
 
   return (
+    <>
     <article className="group">
-      <Link to={`/article/${article.id}`}>
+      <Link to={`/blogs/${article.id}`}>
         <div className="flex items-center space-x-2 mb-3">
           <Link
             to={`/profile/${article.author.username}`}
@@ -239,6 +240,8 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
       </Link>
     </article>
+    <div className="border-b border-gray-200 my-2 w-[80%]"/>
+</>
   );
 };
 

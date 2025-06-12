@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
     { name: 'Blogs', href: '/blogs', icon: BookOpen, requiresPermission: false },
     { name: 'Create Blogs', href: '/create', icon: PenTool, requiresPermission: false },
     { name: 'Drafts', href: '/drafts', icon: FileText, requiresPermission: false },
-    { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: false  },
+    // { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: false  },
     // { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
     // { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
     // { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },

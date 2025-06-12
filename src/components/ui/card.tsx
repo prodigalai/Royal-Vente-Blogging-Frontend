@@ -7,7 +7,7 @@ const Card: React.FC<{
   from: string;
 }> = ({ title, value, icon, from }) => (
   <div
-    className={`bg-gradient-to-br from-${from}-50 to-${from}-100 dark:from-${from}-900/20 dark:to-${from}-800/20 rounded-xl shadow-sm border border-${from}-200 dark:border-${from}-800 p-6`}
+    className={`bg-${from}-700 dark:from-${from}-900/20 dark:to-${from}-800/20 rounded-xl shadow-sm border border-${from}-200 dark:border-${from}-800 p-6`}
   >
     <div className="flex items-center justify-between">
       <div>
