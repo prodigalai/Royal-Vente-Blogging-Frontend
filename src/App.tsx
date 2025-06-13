@@ -138,6 +138,9 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<Profile />} />
         <Route path="following" element={<FollowDetailPage />} />
+        <Route path=":username" element={<Profile />} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
+
       </Route>
 
       {/** Settings under SettingsLayout **/}

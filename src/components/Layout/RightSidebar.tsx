@@ -3,16 +3,33 @@ import { useNavigate } from "react-router-dom";
 
 type SidebarType = "help" | "profile";
 
+// interface RightSidebarProps {
+//   type: SidebarType;
+//   username?: string;
+//   profileImgUrl?: string;
+// }
 interface RightSidebarProps {
   type: SidebarType;
   username?: string;
   profileImgUrl?: string;
+  bio?: string;
+  followers?: number;
+  following?: number;
+  joined?: string;
+  followingList?: { name: string; avatar: string }[];
 }
+
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
   type,
   username = "User",
   profileImgUrl,
+  bio,
+  followers,
+  following,
+  joined,
+  followingList,
+
 }) => {
   const navigate = useNavigate();
 
@@ -29,7 +46,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   ];
 
   return (
-    <div className="fixed top-12 right-0 w-[35rem] py-16 pl-6 min-h-screen border-l border-gray-200 bg-white flex flex-col justify-between dark:bg-gray-900 dark:border-gray-700">
+    <div className="fixed top-12 right-0 w-[30rem] py-16 pl-6 min-h-screen border-l border-gray-200 bg-white flex flex-col justify-between dark:bg-gray-900 dark:border-gray-700">
       {/* Content Section */}
       <div className="mb-6">
         {type === "help" ? (
@@ -57,31 +74,87 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           </>
         ) : (
           <>
-            <div className="w-20 h-20 rounded-full overflow-hidden mb-4">
+  <div className="flex flex-col items-start text-left px-4">
+  {/* Profile image */}
+  <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border border-gray-300 dark:border-gray-600">
+    <img
+      src={profileImgUrl || "https://i.pravatar.cc/100?u=guest"}
+      alt={username}
+      className="w-full h-full object-cover"
+    />
+  </div>
+
+  {/* Username */}
+  <h3 className="text-xl font-semibold font-sans text-gray-900 dark:text-white">{username}</h3>
+
+  {/* Follower count */}
+  <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
+    {followers !== undefined ? `${followers.toLocaleString()} followers` : "1.2K followers"}
+  </p>
+
+  {/* Bio */}
+  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 max-w-xs">
+    {bio || "Passionate storyteller and lifelong learner. ✨"}
+  </p>
+
+  {/* Joined Date */}
+  <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+    Joined {joined || "March 2023"}
+  </p>
+
+  <button
+    className="mt-4 px-5 py-1.5 text-sm font-semibold bg-black text-white rounded-full hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+  >
+    Follow
+  </button>
+
+  {/* Edit Profile Button */}
+  {/* <button
+    className="mt-4 px-4 py-1 text-sm border border-primary-600 text-primary-600 rounded-full hover:bg-primary-50 dark:hover:bg-primary-900/20 transition"
+    onClick={() => navigate("/settings")}
+  >
+    Edit profile
+  </button> */}
+
+  {/* Following List */}
+  {type === "profile" && followingList?.length > 0 && (
+    <div className="mt-8 w-full">
+      <h4 className="font-semibold text-base text-gray-700 dark:text-gray-200 mb-3">
+        Following
+      </h4>
+      <ul className="space-y-3">
+        {followingList.map((person, index) => (
+          <li key={index} className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
               <img
-                src={
-                  profileImgUrl ||
-                  "https://i.pravatar.cc/100?u=ashwini"
-                }
-                alt={username}
-                className="w-full h-full object-cover"
+                src={person.avatar}
+                alt={person.name}
+                className="w-7 h-7 rounded-full"
               />
+              <span className="text-sm text-gray-800 dark:text-gray-100">
+                {person.name}
+              </span>
             </div>
-            <h3 className="text-base font-normal text-gray-900 mb-2 dark:text-white">
-              {username}
-            </h3>
-            <button
-              className="text-sm text-primary-800 hover:text-primary-900 transition-colors"
-              onClick={() => navigate("/settings")}
-            >
-              Edit profile
-            </button>
-          </>
+            {/* Three-dot icon (you can replace this with an actual icon if needed) */}
+            <span className="text-gray-400">•••</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-sm text-gray-800 font-semibold hover:underline cursor-pointer">
+        See all ({following})
+      </p>
+    </div>
+  )}
+</div>
+
+
+</>
+
         )}
       </div>
 
       {/* Footer Section */}
-      <div className="flex flex-wrap">
+      {/* <div className="flex flex-wrap">
         {footerLinks.map(({ key, label }) => (
           <a
             href="#"
@@ -91,7 +164,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             {label}
           </a>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };
