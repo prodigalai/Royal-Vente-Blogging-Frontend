@@ -135,7 +135,7 @@ const Newsletter: React.FC = () => {
 
   const getStatusColor = (status: Campaign['status']) => {
     switch (status) {
-      case 'sent': return 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300';
+      case 'sent': return 'bg-green-100 dark:bg-green-900 text-primary-700 dark:text-primary-300';
       case 'sending': return 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300';
       case 'scheduled': return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300';
       case 'draft': return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
@@ -178,14 +178,14 @@ const Newsletter: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Link
               to="/newsletter/create-campaign"
-              className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+               className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
             >
               <Plus className="w-4 h-4" />
               <span>New Campaign</span>
             </Link>
             <Link
               to="/newsletter/create"
-              className="flex items-center space-x-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:shadow-md"
+                className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
             >
               <Mail className="w-4 h-4" />
               <span>New Newsletter</span>
@@ -345,7 +345,7 @@ const Newsletter: React.FC = () => {
                       <div className="text-right">
                         <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
                           newsletter.isActive 
-                            ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                            ? 'bg-green-100 dark:bg-green-900 text-primary-700 dark:text-primary-300'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}>
                           {newsletter.isActive ? 'Active' : 'Inactive'}
@@ -395,7 +395,7 @@ const Newsletter: React.FC = () => {
 
               <Link
                 to="/newsletter/create-campaign"
-                className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                  className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 <span>New Campaign</span>
@@ -490,7 +490,7 @@ const Newsletter: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Newsletters</h2>
               <Link
                 to="/newsletter/create"
-                className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                  className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create Newsletter</span>
@@ -511,7 +511,7 @@ const Newsletter: React.FC = () => {
                     </div>
                     <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
                       newsletter.isActive 
-                        ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                        ? 'bg-green-100 dark:bg-green-900 text-primary-700 dark:text-primary-300'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     }`}>
                       {newsletter.isActive ? 'Active' : 'Inactive'}
@@ -576,7 +576,7 @@ const Newsletter: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Email Templates</h2>
               <Link
                 to="/newsletter/template/create"
-                className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+   className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create Template</span>
