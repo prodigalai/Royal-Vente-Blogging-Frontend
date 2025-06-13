@@ -96,8 +96,6 @@ const Newsletter: React.FC = () => {
         </div>
       </div>
 <br />
-<br />
-
       {/* Navigation Tabs */}
       <div className="flex items-center space-x-8 mb-8 border-b border-gray-200 dark:border-gray-700 ">
         {tabs.map(({ key, label, icon: Icon, count }) => (
