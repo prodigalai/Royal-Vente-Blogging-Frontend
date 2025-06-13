@@ -10,135 +10,126 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./store";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
+
+// Layouts
 import MainLayout from "./components/Layout/MainLayout";
+import {UserLayout} from "./components/Layout/UserLayout";
+import {SettingsLayout} from "./components/Layout/SettingsLayout";
+import {UserDetailsLayout} from "./components/Layout/UserDetailsLayout";
+
+// Pages
 import LandingPage from "./pages/LandingPage";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import PublicArticles from "./pages/PublicArticles";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 import Home from "./pages/Dashboard";
 import Articles from "./pages/Articles";
-import Profile from "./pages/Profile";
+import ArticlePage from "./pages/ArticlePage";
 import CreateArticle from "./pages/CreateArticle";
 import Drafts from "./pages/Drafts";
 import Analytics from "./pages/Analytics";
 import Tags from "./pages/Tags";
-import Settings from "./pages/Settings";
-import PublicArticles from "./pages/PublicArticles";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import ArticlePage from "./pages/ArticlePage"; // Ensure you import your ArticlePage component
-import UserManagement from "./pages/UserManagement";
-import UserDashboard from "./pages/UserDashboard";
-import CreateOrganization from "./pages/CreateOrganization";
-import OrganizationManage from "./pages/admin/OrganizationManage";
-import { NotificationsPage } from "./pages/Notifications";
-import { UserLayout } from "./components/Layout/UserLayout";
-import { LibraryPage } from "./pages/LibraryPage";
-import { SettingsLayout } from "./components/Layout/SettingsLayout";
-import { UserDetailsLayout } from "./components/Layout/UserDetailsLayout";
+
+import Profile from "./pages/Profile";
 import FollowDetailPage from "./pages/FollowDetailPage";
+
+import {NotificationsPage} from "./pages/Notifications";
+import {LibraryPage} from "./pages/LibraryPage";
+
+import Settings from "./pages/Settings";
+
+import UserManagement from "./pages/UserManagement";
+import OrganizationManage from "./pages/admin/OrganizationManage";
+import CreateOrganization from "./pages/CreateOrganization";
+import UserDashboard from "./pages/UserDashboard";
+import Newsletter from "./pages/Newsletter";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const token = localStorage.getItem("token");
-
-  if (token) {
-    return <>{children}</>;
-  }
-  return <Navigate to="/login" />;
+  return token ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const AppRoutes: React.FC = () => {
-  const token = localStorage.getItem("token");
+  const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   return (
     <Routes>
-      {/* Public Routes */}
+      {/** Public **/}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/public/articles" element={<PublicArticles />} />
+      <Route path="about" element={<About />} />
+      <Route path="contact" element={<Contact />} />
+      <Route path="public/articles" element={<PublicArticles />} />
 
-      {/* Auth Routes */}
+      {/** Auth **/}
       <Route
-        path="/login"
-        element={token ? <Navigate to="/home" /> : <Login />}
+        path="login"
+        element={isAuthenticated ? <Navigate to="/home" /> : <Login />}
       />
       <Route
-        path="/register"
-        element={token ? <Navigate to="/home" /> : <Register />}
+        path="register"
+        element={isAuthenticated ? <Navigate to="/home" /> : <Register />}
       />
 
-      {/* Protected Routes */}
+      {/** All Protected under MainLayout **/}
       <Route
-        path="/home"
         element={
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Home />} />
+        <Route path="home" index element={<Home />} />
+
+        <Route path="blogs">
+          <Route index element={<Articles />} />
+          <Route path=":id" element={<ArticlePage />} />
+        </Route>
+
+        <Route path="create" element={<CreateArticle />} />
+        <Route path="drafts" element={<Drafts />} />
+        <Route path="newsletter"  element={<Newsletter />} />
+
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="tags" element={<Tags />} />
+
+        <Route path="create-organization" element={<CreateOrganization />} />
+
+        {/** Admin sub-section **/}
+        <Route path="admin">
+          <Route path="users" element={<UserManagement />} />
+          <Route
+            path="organization/:orgId/manage"
+            element={<OrganizationManage />}
+          />
+          {/** default to /admin/users */}
+          <Route index element={<Navigate to="users" replace />} />
+        </Route>
+
+        {/** Newsletter routes **/}
       </Route>
 
+      {/** User-specific area under UserLayout **/}
       <Route
-        path="/blogs"
         element={
           <ProtectedRoute>
-            <MainLayout />
+            <UserLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Articles />} />
-        <Route path=":id" element={<ArticlePage />} />{" "}
-        {/* Add the dynamic route for ArticlePage */}
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="library" element={<LibraryPage />} />
+        <Route path="user-dashboard" element={<UserDashboard />} />
       </Route>
 
+      {/** Profile details under its own layout **/}
       <Route
-        path="/create"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<CreateArticle />} />
-      </Route>
-
-      <Route
-        path="/drafts"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Drafts />} />
-      </Route>
-      <Route
-        path="/analytics"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Analytics />} />
-      </Route>
-
-      <Route
-        path="/tags"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Tags />} />
-      </Route>
-
-      <Route
-        path="/profile"
+        path="profile/*"
         element={
           <ProtectedRoute>
             <UserDetailsLayout />
@@ -149,8 +140,9 @@ const AppRoutes: React.FC = () => {
         <Route path="following" element={<FollowDetailPage />} />
       </Route>
 
+      {/** Settings under SettingsLayout **/}
       <Route
-        path="/settings"
+        path="settings"
         element={
           <ProtectedRoute>
             <SettingsLayout />
@@ -160,141 +152,13 @@ const AppRoutes: React.FC = () => {
         <Route index element={<Settings />} />
       </Route>
 
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<NotificationsPage />} />
-      </Route>
-
-      <Route
-        path="/library"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<LibraryPage />} />
-      </Route>
-
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<NotificationsPage />} />
-      </Route>
-
-      <Route
-        path="/library"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<LibraryPage />} />
-      </Route>
-
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<NotificationsPage />} />
-      </Route>
-
-      <Route
-        path="/library"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<LibraryPage />} />
-      </Route>
-
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<NotificationsPage />} />
-      </Route>
-
-      <Route
-        path="/library"
-        element={
-          <ProtectedRoute>
-            <UserLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<LibraryPage />} />
-      </Route>
-
-      <Route
-        path="/create-organization"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<CreateOrganization />} />
-      </Route>
-
-      {/* User Dashboard */}
-      {/* Admin Routes */}
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="users" element={<UserManagement />} />
-        <Route
-          path="organization/:orgId/manage"
-          element={<OrganizationManage />}
-        />
-        <Route index element={<Navigate to="/admin/users" replace />} />
-      </Route>
-
-      {/* Catch all route */}
+      {/** Fallback **/}
       <Route path="*" element={<Navigate to="/" replace />} />
-
-      <Route
-        path="/user-dashboard"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<UserDashboard />} />
-      </Route>
     </Routes>
   );
 };
 
-function App() {
+export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -311,5 +175,3 @@ function App() {
     </Provider>
   );
 }
-
-export default App;

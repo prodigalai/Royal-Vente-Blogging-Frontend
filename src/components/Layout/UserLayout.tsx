@@ -13,10 +13,10 @@ export function UserLayout() {
           <div className="flex-1 py-8">
             <Outlet />
           </div>
-
+{/* 
           <aside className="hidden lg:block relative w-80">
             <StaffPickBar />
-          </aside>
+          </aside> */}
         </div>
       </div>
     </div>

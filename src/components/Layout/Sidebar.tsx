@@ -8,7 +8,8 @@ import {
   Building2,
   Shield,
   FileText,
-  LogOut
+  LogOut,
+  Newspaper
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
@@ -23,10 +24,10 @@ const Sidebar: React.FC = () => {
     { name: 'Home', href: '/home', icon: Home, requiresPermission: false },
     // { name: 'My Dashboard', href: '/user-dashboard', icon: BarChart3, requiresPermission: false },
 
-    { name: 'Blogs', href: '/blogs', icon: BookOpen, requiresPermission: false },
+    // { name: 'Blogs', href: '/blogs', icon: BookOpen, requiresPermission: false },
     { name: 'Create Blogs', href: '/create', icon: PenTool, requiresPermission: false },
     { name: 'Drafts', href: '/drafts', icon: FileText, requiresPermission: false },
-    // { name: 'Users', href: '/admin/users', icon: Users, requiresPermission: false  },
+    { name: 'Newletter', href: '/newsletter', icon: Newspaper, requiresPermission: false  },
     // { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
     // { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
     // { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },
