@@ -1,4 +1,5 @@
 export interface User {
+  name: string | number | readonly string[] | undefined;
   id: string;
   username: string;
   displayName: string;

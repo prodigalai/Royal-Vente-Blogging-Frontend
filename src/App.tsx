@@ -46,7 +46,10 @@ import UserManagement from "./pages/UserManagement";
 import OrganizationManage from "./pages/admin/OrganizationManage";
 import CreateOrganization from "./pages/CreateOrganization";
 import UserDashboard from "./pages/UserDashboard";
-import Newsletter from "./pages/Newsletter";
+import CreateNewsletter from "./pages/CreateNewsletter";
+import CreateCampaign from "./pages/CreateCampaign";
+import { NewsletterProvider } from "./contexts/NewsletterContext";
+import Newsletter from "./components/Newsletter/Newsletter";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -93,8 +96,9 @@ const AppRoutes: React.FC = () => {
 
         <Route path="create" element={<CreateArticle />} />
         <Route path="drafts" element={<Drafts />} />
-        <Route path="newsletter"  element={<Newsletter />} />
-
+<Route path="newsletter" element={<Newsletter />} />
+              <Route path="/newsletter/create" element={<CreateNewsletter />} />
+              <Route path="/newsletter/create-campaign" element={<CreateCampaign />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="tags" element={<Tags />} />
 
@@ -163,6 +167,8 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
+        <NewsletterProvider>
+
           <AuthProvider>
             <Router>
               <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
@@ -170,6 +176,7 @@ export default function App() {
               </div>
             </Router>
           </AuthProvider>
+          </NewsletterProvider>
         </ThemeProvider>
       </PersistGate>
     </Provider>
