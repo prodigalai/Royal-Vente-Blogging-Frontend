@@ -7,16 +7,66 @@ import {
   Heart as ClapIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
+// Dummy data
+const dummyUsers: Record<string, {
+  name: string;
+  avatar: string;
+  cover: string;
+  bio: string;
+  followers: number;
+  following: number;
+}> = {
+  ashwini: {
+    name: "Ashwini Balasaheb Nargarboje",
+    avatar: "https://i.pravatar.cc/100?u=ashwini",
+    cover: "https://picsum.photos/seed/cover/1200/300",
+    bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
+    followers: 124,
+    following: 56,
+  },
+  johndoe: {
+    name: "John Doe",
+    avatar: "https://i.pravatar.cc/100?u=john",
+    cover: "https://picsum.photos/seed/john/1200/300",
+    bio: "Tech writer and software architect. Loves systems design and good espresso.",
+    followers: 230,
+    following: 89,
+  },
+  janesmith: {
+    name: "Jane Smith",
+    avatar: "https://i.pravatar.cc/100?u=jane",
+    cover: "https://picsum.photos/seed/jane/1200/300",
+    bio: "Frontend engineer. Cat mom. Vue and React enthusiast.",
+    followers: 180,
+    following: 102,
+  },
+  emilybrown: {
+    name: "Emily Brown",
+    avatar: "https://i.pravatar.cc/100?u=emily",
+    cover: "https://picsum.photos/seed/john/1200/300",
+    bio: "Tech writer and software architect. Loves systems design and good espresso.",
+    followers: 428,
+    following: 46,
+    
+  },
+};
+
+
+// Default dummy user (current user)
+const defaultUser = dummyUsers["ashwini"];
+
 
 // —————— Dummy user and content data ——————
-const user = {
-  name: "Ashwini Balasaheb Nargarboje",
-  avatar: "https://i.pravatar.cc/100?u=ashwini",
-  cover: "https://picsum.photos/seed/cover/1200/300",
-  bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
-  followers: 124,
-  following: 56,
-};
+// const user = {
+//   name: "Ashwini Balasaheb Nargarboje",
+//   avatar: "https://i.pravatar.cc/100?u=ashwini",
+//   cover: "https://picsum.photos/seed/cover/1200/300",
+//   bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
+//   followers: 124,
+//   following: 56,
+// };
 
 const dummyLists = [
   {
@@ -87,8 +137,15 @@ const Profile: React.FC = () => {
   );
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [bioText, setBioText] = useState(user.bio);
+  
+  const { username } = useParams();
+  const userInfo = username ? dummyUsers[username.toLowerCase()] || defaultUser : defaultUser;
 
+  if (username && !dummyUsers[username.toLowerCase()]) {
+    return <div className="text-center text-red-500 mt-10">User not found</div>;
+  }
+  
+  const [bioText, setBioText] = useState(userInfo.bio);
   const copyProfileLink = () => {
     if (typeof window !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
@@ -97,17 +154,17 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8 lg:px-16">
+    <div className="max-w-6xl mx-auto lg:px-16">
       {/* Cover + Avatar */}
       <div className="relative">
         <img
-          src={user.cover}
+          src={userInfo.cover}
           alt="Cover"
           className="w-full h-48 object-cover rounded-b-lg"
         />
         <div className="absolute -bottom-12 left-8">
           <img
-            src={user.avatar}
+            src={userInfo.avatar}
             alt="Avatar"
             className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800"
           />
@@ -118,20 +175,20 @@ const Profile: React.FC = () => {
       <div className="flex items-center justify-between mt-16 px-8">
         <div>
           <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
-            {user.name}
+            {userInfo.name}
           </h1>
           <div className="flex items-center space-x-6 mt-2 text-gray-600 dark:text-gray-400">
             <span
               className="cursor-pointer hover:underline"
               onClick={() => navigate("/profile/followers")}
             >
-              {user.followers} followers
+              {userInfo.followers} followers
             </span>
             <span
               className="cursor-pointer hover:underline"
               onClick={() => navigate("/profile/following")}
             >
-              {user.following} following
+              {userInfo.following} following
             </span>
           </div>
         </div>
@@ -192,12 +249,12 @@ const Profile: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={user.avatar}
+                      src={userInfo.avatar}
                       alt="owner"
                       className="w-8 h-8 rounded-full"
                     />
                     <span className="font-medium text-gray-900 dark:text-white">
-                      {user.name}
+                      {userInfo.name}
                     </span>
                   </div>
                   <MoreHorizontal className="w-5 h-5 text-gray-500 dark:text-gray-400" />
