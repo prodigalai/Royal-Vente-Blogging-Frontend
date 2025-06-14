@@ -8,65 +8,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { dummyUsers, defaultUser } from "../constants/dummyUsers";
 
-// Dummy data
-const dummyUsers: Record<string, {
-  name: string;
-  avatar: string;
-  cover: string;
-  bio: string;
-  followers: number;
-  following: number;
-}> = {
-  ashwini: {
-    name: "Ashwini Balasaheb Nargarboje",
-    avatar: "https://i.pravatar.cc/100?u=ashwini",
-    cover: "https://picsum.photos/seed/cover/1200/300",
-    bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
-    followers: 124,
-    following: 56,
-  },
-  johndoe: {
-    name: "John Doe",
-    avatar: "https://i.pravatar.cc/100?u=john",
-    cover: "https://picsum.photos/seed/john/1200/300",
-    bio: "Tech writer and software architect. Loves systems design and good espresso.",
-    followers: 230,
-    following: 89,
-  },
-  janesmith: {
-    name: "Jane Smith",
-    avatar: "https://i.pravatar.cc/100?u=jane",
-    cover: "https://picsum.photos/seed/jane/1200/300",
-    bio: "Frontend engineer. Cat mom. Vue and React enthusiast.",
-    followers: 180,
-    following: 102,
-  },
-  emilybrown: {
-    name: "Emily Brown",
-    avatar: "https://i.pravatar.cc/100?u=emily",
-    cover: "https://picsum.photos/seed/john/1200/300",
-    bio: "Tech writer and software architect. Loves systems design and good espresso.",
-    followers: 428,
-    following: 46,
-    
-  },
-};
-
-
-// Default dummy user (current user)
-const defaultUser = dummyUsers["ashwini"];
-
-
-// —————— Dummy user and content data ——————
-// const user = {
-//   name: "Ashwini Balasaheb Nargarboje",
-//   avatar: "https://i.pravatar.cc/100?u=ashwini",
-//   cover: "https://picsum.photos/seed/cover/1200/300",
-//   bio: "Full-stack developer passionate about creating interactive web experiences. Loves coffee, cats, and open-source.",
-//   followers: 124,
-//   following: 56,
-// };
 
 const dummyLists = [
   {
