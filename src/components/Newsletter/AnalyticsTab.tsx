@@ -104,7 +104,7 @@ const AnalyticsTab: React.FC = () => {
             <Filter className="w-4 h-4" />
             <span>Filter</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
             <Download className="w-4 h-4" />
             <span>Export</span>
           </button>

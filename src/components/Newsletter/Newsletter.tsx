@@ -88,7 +88,7 @@ const Newsletter: React.FC = () => {
           </Link>
           <Link
             to="/newsletter/create-campaign"
-            className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <Send className="w-4 h-4" />
             <span>Create Campaign</span>

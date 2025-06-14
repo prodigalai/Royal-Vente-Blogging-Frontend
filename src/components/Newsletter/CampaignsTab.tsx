@@ -136,7 +136,7 @@ const CampaignsTab: React.FC = () => {
         <div className="flex items-center space-x-4">
           <button
             onClick={openCreate}
-            className="flex items-center space-x-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
+            className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
           >
             <Plus className="w-4 h-4" />
             <span>New Campaign</span>
@@ -293,7 +293,7 @@ const CampaignsTab: React.FC = () => {
                   required
                 />
               </div>
-              <button className="w-full bg-teal-600 text-white py-2 rounded">
+              <button className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-2 rounded">
                 Schedule
               </button>
             </form>

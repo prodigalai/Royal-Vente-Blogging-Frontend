@@ -166,7 +166,7 @@ const SocialMediaTab: React.FC = () => {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+          className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Create Post</span>
