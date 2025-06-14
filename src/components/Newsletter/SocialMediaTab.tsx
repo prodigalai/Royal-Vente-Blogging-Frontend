@@ -141,37 +141,48 @@ const SocialMediaTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          {[
-            { key: "overview", label: "Overview", icon: BarChart3 },
-            { key: "posts", label: "Posts", icon: MessageCircle },
-            { key: "analytics", label: "Analytics", icon: BarChart3 },
-            { key: "settings", label: "Settings", icon: Settings },
-          ].map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key as any)}
-              className={`flex items-center space-x-2 pb-2 border-b-2 transition-colors ${
-                activeTab === key
-                  ? "border-teal-600 text-teal-600"
-                  : "border-transparent text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="font-medium">{label}</span>
-            </button>
-          ))}
+      {/* Header with Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Social Media Dashboard</h2>
+          <p className="text-gray-600">
+            Manage your social accounts, posts, and insights in one place
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create Post</span>
-        </button>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Post</span>
+          </button>
+        </div>
       </div>
+
+      {/* Navigation Tabs */}
+      <div className="flex items-center space-x-6 border-b border-gray-200 pt-6">
+        {[
+          { key: "overview", label: "Overview", icon: BarChart3 },
+          { key: "posts", label: "Posts", icon: MessageCircle },
+          { key: "analytics", label: "Analytics", icon: BarChart3 },
+          { key: "settings", label: "Settings", icon: Settings },
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key as any)}
+            className={`flex items-center space-x-2 pb-2 border-b-2 transition-colors ${
+              activeTab === key
+                ? "border-teal-600 text-teal-600"
+                : "border-transparent text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            <span className="font-medium">{label}</span>
+          </button>
+        ))}
+      </div>
+
 
       {/* Overview */}
       {activeTab === "overview" && (
