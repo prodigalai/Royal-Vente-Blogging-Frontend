@@ -1,3 +1,4 @@
+// src/components/Newsletter/TemplateCard.tsx
 import React from 'react';
 import { Star, MoreHorizontal, Edit3, Trash2, Copy, Download } from 'lucide-react';
 import { Template } from '../../types/newsletter';
@@ -11,13 +12,13 @@ interface TemplateCardProps {
   onDuplicate?: (template: Template) => void;
 }
 
-const TemplateCard: React.FC<TemplateCardProps> = ({ 
-  template, 
-  onPreview, 
-  onUse, 
-  onEdit, 
-  onDelete, 
-  onDuplicate 
+const TemplateCard: React.FC<TemplateCardProps> = ({
+  template,
+  onPreview,
+  onUse,
+  onEdit,
+  onDelete,
+  onDuplicate
 }) => {
   const [showActions, setShowActions] = React.useState(false);
 
@@ -67,27 +68,27 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
             </button>
             <button
               onClick={() => onUse(template)}
-              className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+              className="bg-teal-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors"
             >
               Use Template
             </button>
           </div>
         </div>
       </div>
-      
+
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
           <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1">
             {template.name}
           </h3>
           <div className="relative">
-            <button 
+            <button
               onClick={() => setShowActions(!showActions)}
               className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
-            
+
             {showActions && (
               <div className="absolute right-0 top-8 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 min-w-[120px]">
                 <button
@@ -121,11 +122,11 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
             )}
           </div>
         </div>
-        
+
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
           {template.description}
         </p>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {template.uses.toLocaleString()} uses

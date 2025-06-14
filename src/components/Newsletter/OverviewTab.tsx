@@ -1,78 +1,104 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Users, Eye, Target, Send, CheckCircle, Clock, RefreshCw, Edit3, TrendingUp, Calendar, Mail, Zap } from 'lucide-react';
-import { useNewsletter } from '../../contexts/NewsletterContext';
-import { Campaign } from '../../types/newsletter';
-import StatsCard from './StatsCard';
+// src/components/Newsletter/OverviewTab.tsx
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  Users,
+  Eye,
+  Target,
+  Send,
+  CheckCircle,
+  Clock,
+  RefreshCw,
+  Edit3,
+  TrendingUp,
+  Calendar,
+  Mail,
+  Zap,
+} from "lucide-react";
+import { useNewsletter } from "../../contexts/NewsletterContext";
+import { Campaign } from "../../types/newsletter";
+import StatsCard from "./StatsCard";
 
 const OverviewTab: React.FC = () => {
   const { newsletters, campaigns, automations, subscribers } = useNewsletter();
 
-  const totalSubscribers = newsletters.reduce((sum, newsletter) => sum + newsletter.subscribers, 0);
-  const avgOpenRate = newsletters.reduce((sum, newsletter) => sum + newsletter.openRate, 0) / newsletters.length;
-  const avgClickRate = newsletters.reduce((sum, newsletter) => sum + newsletter.clickRate, 0) / newsletters.length;
-  const activeCampaigns = campaigns.filter(c => c.status !== 'draft').length;
-  const scheduledCampaigns = campaigns.filter(c => c.status === 'scheduled').length;
+  const totalSubscribers = newsletters.reduce(
+    (sum, n) => sum + n.subscribers,
+    0
+  );
+  const avgOpenRate =
+    newsletters.reduce((sum, n) => sum + n.openRate, 0) / newsletters.length;
+  const avgClickRate =
+    newsletters.reduce((sum, n) => sum + n.clickRate, 0) / newsletters.length;
+  const activeCampaigns = campaigns.filter((c) => c.status !== "draft").length;
+  const scheduledCampaigns = campaigns.filter(
+    (c) => c.status === "scheduled"
+  ).length;
 
-  const getCampaignIcon = (status: Campaign['status']) => {
+  const getCampaignIcon = (status: Campaign["status"]) => {
     switch (status) {
-      case 'sent':
+      case "sent":
         return CheckCircle;
-      case 'scheduled':
+      case "scheduled":
         return Clock;
-      case 'sending':
+      case "sending":
         return RefreshCw;
       default:
         return Edit3;
     }
   };
 
-  const getCampaignIconColor = (status: Campaign['status']) => {
+  const getCampaignIconColor = (status: Campaign["status"]) => {
     switch (status) {
-      case 'sent':
-        return 'text-green-600';
-      case 'scheduled':
-        return 'text-blue-600';
-      case 'sending':
-        return 'text-yellow-600 animate-spin';
+      case "sent":
+        return "text-teal-600";
+      case "scheduled":
+        return "text-blue-600";
+      case "sending":
+        return "text-yellow-600 animate-spin";
       default:
-        return 'text-gray-600';
+        return "text-gray-600";
     }
   };
 
-  const getCampaignBgColor = (status: Campaign['status']) => {
+  const getCampaignBgColor = (status: Campaign["status"]) => {
     switch (status) {
-      case 'sent':
-        return 'bg-green-100';
-      case 'scheduled':
-        return 'bg-blue-100';
-      case 'sending':
-        return 'bg-yellow-100';
+      case "sent":
+        return "bg-teal-100";
+      case "scheduled":
+        return "bg-blue-100";
+      case "sending":
+        return "bg-yellow-100";
       default:
-        return 'bg-gray-100';
+        return "bg-gray-100";
     }
   };
 
   return (
     <div className="space-y-8">
       {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-xl p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-emerald-900 mb-2">Welcome back! Ready to engage your audience?</h3>
-            <p className="text-emerald-700">Create campaigns, manage subscribers, and track your newsletter performance.</p>
+            <h3 className="text-lg font-semibold text-teal-900 mb-2">
+              Welcome back! Ready to engage your audience?
+            </h3>
+            <p className="text-teal-700">
+              Create campaigns, manage subscribers, and track your newsletter
+              performance.
+            </p>
           </div>
           <div className="flex items-center space-x-3">
             <Link
               to="/newsletter/create"
-              className="flex items-center space-x-2 bg-white text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-50 transition-colors border border-emerald-200"
+              className="flex items-center space-x-2 bg-white text-teal-700 px-4 py-2 rounded-lg hover:bg-teal-50 transition-colors border border-teal-200"
             >
               <Mail className="w-4 h-4" />
               <span>New Newsletter</span>
             </Link>
             <Link
               to="/newsletter/create-campaign"
-              className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+              className="flex items-center space-x-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
             >
               <Send className="w-4 h-4" />
               <span>Create Campaign</span>
@@ -88,10 +114,10 @@ const OverviewTab: React.FC = () => {
           value={totalSubscribers.toLocaleString()}
           subtitle="+12% this month"
           icon={Users}
-          colorClass="border-emerald-200"
-          gradient="bg-gradient-to-br from-emerald-50 to-emerald-100"
+          colorClass="border-teal-200"
+          gradient="bg-gradient-to-br from-teal-50 to-teal-100"
         />
-        
+
         <StatsCard
           title="Avg Open Rate"
           value={`${avgOpenRate.toFixed(1)}%`}
@@ -100,16 +126,16 @@ const OverviewTab: React.FC = () => {
           colorClass="border-blue-200"
           gradient="bg-gradient-to-br from-blue-50 to-blue-100"
         />
-        
+
         <StatsCard
           title="Avg Click Rate"
-          value={`${avgClickRate.toFixed(1)}%`}       
+          value={`${avgClickRate.toFixed(1)}%`}
           subtitle="+0.8% vs industry"
           icon={Target}
           colorClass="border-purple-200"
           gradient="bg-gradient-to-br from-purple-50 to-purple-100"
         />
-        
+
         <StatsCard
           title="Active Campaigns"
           value={activeCampaigns}
@@ -125,32 +151,46 @@ const OverviewTab: React.FC = () => {
         {/* Recent Campaigns */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Campaigns</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Recent Campaigns
+            </h3>
             <Link
               to="/newsletter/create-campaign"
-              className="text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+              className="text-teal-600 hover:text-teal-700 font-medium text-sm transition-colors"
             >
               Create New
             </Link>
           </div>
           <div className="space-y-4">
-            {campaigns.slice(0, 3).map((campaign) => {
-              const StatusIcon = getCampaignIcon(campaign.status);
+            {campaigns.slice(0, 3).map((c) => {
+              const Icon = getCampaignIcon(c.status);
               return (
-                <div key={campaign.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className={`p-2 rounded-lg ${getCampaignBgColor(campaign.status)}`}>
-                    <StatusIcon className={`w-4 h-4 ${getCampaignIconColor(campaign.status)}`} />
+                <div
+                  key={c.id}
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div
+                    className={`p-2 rounded-lg ${getCampaignBgColor(c.status)}`}
+                  >
+                    <Icon
+                      className={`w-4 h-4 ${getCampaignIconColor(c.status)}`}
+                    />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900 line-clamp-1">{campaign.subject}</p>
+                    <p className="font-medium text-gray-900 line-clamp-1">
+                      {c.subject}
+                    </p>
                     <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <span>{campaign.newsletter}</span>
+                      <span>{c.newsletter}</span>
                       <span>•</span>
-                      <span className="capitalize">{campaign.status}</span>
-                      {campaign.status === 'sent' && (
+                      <span className="capitalize">{c.status}</span>
+                      {c.status === "sent" && (
                         <>
                           <span>•</span>
-                          <span>{((campaign.opens / campaign.recipients) * 100).toFixed(1)}% open rate</span>
+                          <span>
+                            {((c.opens / c.recipients) * 100).toFixed(1)}% open
+                            rate
+                          </span>
                         </>
                       )}
                     </div>
@@ -164,32 +204,37 @@ const OverviewTab: React.FC = () => {
         {/* Newsletter Performance */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Newsletter Performance</h3>
-            <button className="text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Newsletter Performance
+            </h3>
+            <button className="text-teal-600 hover:text-teal-700 font-medium text-sm transition-colors">
               View All
             </button>
           </div>
           <div className="space-y-4">
-            {newsletters.map((newsletter) => (
-              <div key={newsletter.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                {newsletter.logo && (
+            {newsletters.map((n) => (
+              <div
+                key={n.id}
+                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                {n.logo && (
                   <img
-                    src={newsletter.logo}
-                    alt={newsletter.name}
+                    src={n.logo}
+                    alt={n.name}
                     className="w-10 h-10 rounded-lg object-cover"
                   />
                 )}
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <p className="font-medium text-gray-900">{newsletter.name}</p>
-                    {newsletter.isActive && (
-                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <p className="font-medium text-gray-900">{n.name}</p>
+                    {n.isActive && (
+                      <span className="w-2 h-2 bg-teal-500 rounded-full" />
                     )}
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>{newsletter.subscribers.toLocaleString()} subscribers</span>
-                    <span>{newsletter.openRate}% open rate</span>
-                    <span>{newsletter.clickRate}% click rate</span>
+                    <span>{n.subscribers.toLocaleString()} subscribers</span>
+                    <span>{n.openRate}% open rate</span>
+                    <span>{n.clickRate}% click rate</span>
                   </div>
                 </div>
               </div>
@@ -198,41 +243,52 @@ const OverviewTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Automations & Analytics */}
+      {/* Automations & Quick Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Active Automations */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Active Automations</h3>
-            <span className="text-emerald-600 font-medium text-sm">
-              {automations.filter(a => a.status === 'active').length} running
+            <h3 className="text-lg font-semibold text-gray-900">
+              Active Automations
+            </h3>
+            <span className="text-teal-600 font-medium text-sm">
+              {automations.filter((a) => a.status === "active").length} running
             </span>
           </div>
           <div className="space-y-4">
-            {automations.slice(0, 3).map((automation) => (
-              <div key={automation.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className={`p-2 rounded-lg ${
-                  automation.status === 'active' ? 'bg-green-100' : 'bg-gray-100'
-                }`}>
-                  <Zap className={`w-4 h-4 ${
-                    automation.status === 'active' ? 'text-green-600' : 'text-gray-600'
-                  }`} />
+            {automations.slice(0, 3).map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    a.status === "active" ? "bg-teal-100" : "bg-gray-100"
+                  }`}
+                >
+                  <Zap
+                    className={`w-4 h-4 ${
+                      a.status === "active" ? "text-teal-600" : "text-gray-600"
+                    }`}
+                  />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <p className="font-medium text-gray-900">{automation.name}</p>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      automation.status === 'active' 
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {automation.status}
+                    <p className="font-medium text-gray-900">{a.name}</p>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        a.status === "active"
+                          ? "bg-teal-100 text-teal-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {a.status}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <span>{automation.subscribers.toLocaleString()} subscribers</span>
+                    <span>{a.subscribers.toLocaleString()} subscribers</span>
                     <span>•</span>
-                    <span>{automation.openRate}% open rate</span>
+                    <span>{a.openRate}% open rate</span>
                   </div>
                 </div>
               </div>
@@ -242,7 +298,9 @@ const OverviewTab: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Quick Stats</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Quick Stats
+          </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
               <div className="flex items-center space-x-3">
@@ -255,21 +313,23 @@ const OverviewTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-teal-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                <span className="font-medium text-green-900">Growth Rate</span>
+                <TrendingUp className="w-5 h-5 text-teal-600" />
+                <span className="font-medium text-teal-900">Growth Rate</span>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-green-900">+12%</p>
-                <p className="text-sm text-green-700">This month</p>
+                <p className="text-lg font-bold text-teal-900">+12%</p>
+                <p className="text-sm text-teal-700">This month</p>
               </div>
             </div>
 
             <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Users className="w-5 h-5 text-purple-600" />
-                <span className="font-medium text-purple-900">New Subscribers</span>
+                <span className="font-medium text-purple-900">
+                  New Subscribers
+                </span>
               </div>
               <div className="text-right">
                 <p className="text-lg font-bold text-purple-900">245</p>
@@ -280,7 +340,9 @@ const OverviewTab: React.FC = () => {
             <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Eye className="w-5 h-5 text-orange-600" />
-                <span className="font-medium text-orange-900">Avg Engagement</span>
+                <span className="font-medium text-orange-900">
+                  Avg Engagement
+                </span>
               </div>
               <div className="text-right">
                 <p className="text-lg font-bold text-orange-900">4.2%</p>
