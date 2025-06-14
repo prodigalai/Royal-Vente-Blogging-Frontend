@@ -1,105 +1,120 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// src/components/Sidebar.tsx
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   BookOpen,
   PenTool,
-  Users,
-  Building2,
-  Shield,
   FileText,
+  Newspaper,
   LogOut,
-  Newspaper
-} from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../store/slices/authSlice';
-import { hasPermission } from '../../utils/permissions';
+  ChevronDown,
+  Mail,
+  LayoutList,
+} from "lucide-react";
+import { useSite } from "../../contexts/SiteContext";
+
+const navItems = {
+  blog: [
+    { name: "Home", href: "/blog/home", icon: Home },
+    { name: "All Posts", href: "/blog", icon: BookOpen },
+    { name: "Create Post", href: "/blog/create", icon: PenTool },
+    { name: "Drafts", href: "/blog/drafts", icon: FileText },
+  ],
+  newsletter: [
+    { name: "All Newsletters", href: "/newsletter", icon: Newspaper },
+    { name: "Email Builder", href: "email-builder", icon: Mail },
+    { name: "Templates", href: "temlplets", icon: LayoutList },
+    { name: "Create Newsletter", href: "/newsletter/create", icon: PenTool },
+  ],
+} as const;
 
 const Sidebar: React.FC = () => {
-  const user = useSelector(selectCurrentUser);
+  const { site, setSite } = useSite();
   const location = useLocation();
-  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+  const [isSiteMenuOpen, setIsSiteMenuOpen] = useState(false);
 
-  const navigation = [
-    { name: 'Home', href: '/home', icon: Home, requiresPermission: false },
-    // { name: 'My Dashboard', href: '/user-dashboard', icon: BarChart3, requiresPermission: false },
-
-    // { name: 'Blogs', href: '/blogs', icon: BookOpen, requiresPermission: false },
-    { name: 'Create Blogs', href: '/create', icon: PenTool, requiresPermission: false },
-    { name: 'Drafts', href: '/drafts', icon: FileText, requiresPermission: false },
-    { name: 'Newletter', href: '/newsletter', icon: Newspaper, requiresPermission: false  },
-    // { name: 'Orgs', href: '/admin/organizations', icon: Building2, requiresPermission: false },
-    // { name: 'Sys', href: '/admin/settings', icon: Settings, requiresPermission: false },
-    // { name: 'Sec', href: '/admin/security', icon: Shield, requiresPermission: false },
-  ];
-
-  const shouldShowNavItem = (item: any) => {
-    if (!token) return false;
-    if (!item.requiresPermission) return true;
-    return hasPermission(user, item.requiresPermission.resource, item.requiresPermission.action);
+  const switchSite = (newSite: "blog" | "newsletter") => {
+    setSite(newSite);
+    setIsSiteMenuOpen(false);
+    navigate(newSite === "blog" ? "/blog/home" : "/newsletter");
   };
 
+  const navigation = navItems[site];
   const isActive = (href: string) => location.pathname === href;
 
-  if (!token) return null;
-
   return (
-    <div className="h-screen w-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-800 flex flex-col justify-between items-center py-4 fixed left-0 top-0 z-40 transition-colors">
-      {/* Logo */}
-      <div className="mb-4">
-        <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center transition-colors">
-          <span className="text-xl font-bold text-white">Y</span>
-        </div>
+    <div className="fixed inset-y-0 left-0 z-50 w-16 flex flex-col justify-between bg-white/80 dark:bg-black/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-800">
+      {/* Logo + Site Switcher */}
+      <div className="flex flex-col items-center mt-4 relative">
+        <button
+          onClick={() => setIsSiteMenuOpen((o) => !o)}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+        >
+          <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        </button>
+
+        {isSiteMenuOpen && (
+          <div className="absolute left-full top-0 ml-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2">
+            <button
+              onClick={() => switchSite("blog")}
+              className={`w-full text-left px-4 py-2 text-sm ${
+                site === "blog"
+                  ? "font-semibold text-primary-600"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+            >
+              Royal Vente Blog
+            </button>
+            <button
+              onClick={() => switchSite("newsletter")}
+              className={`w-full text-left px-4 py-2 text-sm ${
+                site === "newsletter"
+                  ? "font-semibold text-primary-600"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+            >
+              Royal Vente Newsletter
+            </button>
+          </div>
+        )}
       </div>
-      {/* Main Navigation */}
-      <nav className="flex-1 flex flex-col gap-2 items-center mt-2 overflow-y-auto scrollbar-hide">
+
+      {/* Navigation */}
+      <nav className="flex-1 flex flex-col items-center mt-6 space-y-2">
         {navigation.map((item) => {
-          if (!shouldShowNavItem(item)) return null;
           const Icon = item.icon;
-          const active = isActive(item.href);
           return (
             <Link
-              key={item.name}
+              key={item.href}
               to={item.href}
-              className={`group relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
-                active
-                  ? 'bg-primary-600/30 text-primary-600'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-white'
+              className={`group relative flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
+                isActive(item.href)
+                  ? "bg-primary-600 text-white"
+                  : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600"
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[8px] mt-0.5 hidden group-hover:block text-center whitespace-nowrap">{item.name}</span>
-              {/* Enhanced Tooltip */}
-              <div className="absolute left-full ml-2 px-3 py-1.5 bg-gray-900/95 dark:bg-gray-800/95 text-white text-xs rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-x-0 translate-x-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg backdrop-blur-sm border border-gray-700/50">
+              <span className="absolute left-full ml-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
                 {item.name}
-                <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-gray-900/95 dark:bg-gray-800/95 transform rotate-45 border-l border-b border-gray-700/50"></div>
-              </div>
+              </span>
             </Link>
           );
         })}
       </nav>
-      {/* User Role Badge & Logout */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="relative group">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center transition-colors cursor-pointer hover:scale-105 transform duration-200">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          {/* Enhanced Tooltip */}
-          <div className="absolute left-full ml-2 px-3 py-1.5 bg-gray-900/95 dark:bg-gray-800/95 text-white text-xs rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-x-0 translate-x-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg backdrop-blur-sm border border-gray-700/50">
-            {user?.systemRole || 'User'} Role
-            <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-gray-900/95 dark:bg-gray-800/95 transform rotate-45 border-l border-b border-gray-700/50"></div>
-          </div>
-        </div>
-        <div className="relative group">
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 transform">
-            <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
-          {/* Enhanced Tooltip */}
-          <div className="absolute left-full ml-2 px-3 py-1.5 bg-gray-900/95 dark:bg-gray-800/95 text-white text-xs rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-x-0 translate-x-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg backdrop-blur-sm border border-gray-700/50">
-            Logout
-            <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-gray-900/95 dark:bg-gray-800/95 transform rotate-45 border-l border-b border-gray-700/50"></div>
-          </div>
-        </div>
+
+      {/* Logout */}
+      <div className="flex flex-col items-center mb-4">
+        <Link
+          to="/logout"
+          className="group flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-300 group-hover:text-red-600" />
+          <span className="absolute left-full ml-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            Sign out
+          </span>
+        </Link>
       </div>
     </div>
   );

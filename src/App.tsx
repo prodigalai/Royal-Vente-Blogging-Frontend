@@ -13,9 +13,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 // Layouts
 import MainLayout from "./components/Layout/MainLayout";
-import {UserLayout} from "./components/Layout/UserLayout";
-import {SettingsLayout} from "./components/Layout/SettingsLayout";
-import {UserDetailsLayout} from "./components/Layout/UserDetailsLayout";
+import { UserLayout } from "./components/Layout/UserLayout";
+import { SettingsLayout } from "./components/Layout/SettingsLayout";
+import { UserDetailsLayout } from "./components/Layout/UserDetailsLayout";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -37,8 +37,8 @@ import Tags from "./pages/Tags";
 import Profile from "./pages/Profile";
 import FollowDetailPage from "./pages/FollowDetailPage";
 
-import {NotificationsPage} from "./pages/Notifications";
-import {LibraryPage} from "./pages/LibraryPage";
+import { NotificationsPage } from "./pages/Notifications";
+import { LibraryPage } from "./pages/LibraryPage";
 
 import Settings from "./pages/Settings";
 
@@ -50,6 +50,11 @@ import CreateNewsletter from "./pages/CreateNewsletter";
 import CreateCampaign from "./pages/CreateCampaign";
 import { NewsletterProvider } from "./contexts/NewsletterContext";
 import Newsletter from "./components/Newsletter/Newsletter";
+import CapabilitiesPage from "./components/Newsletter/CapabilitiesPage";
+import { SiteProvider } from "./contexts/SiteContext";
+import EmailBuilderPage from "./components/Newsletter/EmailBuilderPage";
+import TemplatesTab from "./components/Newsletter/TemplatesTab";
+import SubscriberManagement from "./components/Newsletter/SubscriberManagement";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -96,9 +101,18 @@ const AppRoutes: React.FC = () => {
 
         <Route path="create" element={<CreateArticle />} />
         <Route path="drafts" element={<Drafts />} />
-<Route path="newsletter" element={<Newsletter />} />
-              <Route path="/newsletter/create" element={<CreateNewsletter />} />
-              <Route path="/newsletter/create-campaign" element={<CreateCampaign />} />
+        <Route path="newsletter" element={<Newsletter />} />
+        <Route path="/capabilities" element={<CapabilitiesPage />} />
+        <Route path="/newsletter/create" element={<CreateNewsletter />} />
+        <Route path="email-builder" element={< EmailBuilderPage />} />
+
+        <Route path="temlplets" element={<TemplatesTab />} />
+
+
+        <Route
+          path="/newsletter/create-campaign"
+          element={<CreateCampaign />}
+        />
         <Route path="analytics" element={<Analytics />} />
         <Route path="tags" element={<Tags />} />
 
@@ -144,7 +158,6 @@ const AppRoutes: React.FC = () => {
         <Route path="following" element={<FollowDetailPage />} />
         <Route path=":username" element={<Profile />} />
         {/* <Route path="/profile" element={<Profile />} /> */}
-
       </Route>
 
       {/** Settings under SettingsLayout **/}
@@ -170,15 +183,16 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
-        <NewsletterProvider>
-
-          <AuthProvider>
-            <Router>
-              <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
-                <AppRoutes />
-              </div>
-            </Router>
-          </AuthProvider>
+          <NewsletterProvider>
+            <SiteProvider>
+              <AuthProvider>
+                <Router>
+                  <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+                    <AppRoutes />
+                  </div>
+                </Router>
+              </AuthProvider>
+            </SiteProvider>
           </NewsletterProvider>
         </ThemeProvider>
       </PersistGate>
