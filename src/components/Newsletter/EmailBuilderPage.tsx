@@ -393,8 +393,35 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
     transition: 'transform 0.2s ease'
   });
 
-  const DraggableBlock: React.FC<{ block: EmailBlock; index: number }> = ({ block, index }) => {
+  // const DraggableBlock: React.FC<{ block: EmailBlock; index: number }> = ({ block, index }) => {
+  const DraggableBlock: React.FC<{ block: EmailBlock; index: number; selectedBlock: string | null; setSelectedBlock: (id: string | null) => void }> = ({ block, index, selectedBlock, setSelectedBlock }) => {
+  
     const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      function handleClickOutside(event: MouseEvent) {
+        
+        const canvas = document.getElementById("email-canvas");
+        const sidebar = document.getElementById("block-settings");
+
+        if (
+          canvas &&
+          !canvas.contains(event.target as Node) &&
+          sidebar &&
+          !sidebar.contains(event.target as Node)
+        ) {
+          setSelectedBlock(null);
+        }
+
+
+      }
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
     const [{ handlerId }, drop] = useDrop({
       accept: 'block',
       collect(monitor) {
@@ -442,7 +469,7 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
       <div
         ref={ref}
         data-handler-id={handlerId}
-        style={{ opacity }}
+        style={{ opacity, cursor: 'move' }}
         className={`group relative border-2 border-dashed transition-all duration-200 ${
           selectedBlock === block.id 
             ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-lg' 
@@ -450,12 +477,19 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
             ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20'
             : 'border-transparent hover:border-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10'
         }`}
-        onClick={() => setSelectedBlock(block.id)}
+        // onClick={() => setSelectedBlock(block.id)}
+        onClick={(e) => {
+          e.stopPropagation(); 
+          setSelectedBlock(block.id);
+        }}
+
       >
         {/* Block Controls */}
-        <div className={`absolute -top-10 left-0 right-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 ${
-          selectedBlock === block.id ? 'opacity-100' : ''
+        
+        <div className={`flex items-center justify-between mb-2 transition-opacity duration-200 ${
+          selectedBlock === block.id || isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
         }`}>
+
           <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg px-2 py-1">
             <button
               onClick={(e) => {
@@ -480,6 +514,7 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
             <div 
               className="p-1 text-gray-600 dark:text-gray-400 cursor-move rounded"
               title="Drag to reorder"
+              ref={drag}
             >
               <GripVertical className="w-3 h-3" />
             </div>
@@ -517,30 +552,64 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
             </div>
           </div>
         );
+      
       case 'image':
-        return (
-          <div style={block.styles} className="p-4">
-            {block.content.src ? (
-              <img
-                src={block.content.src}
-                alt={block.content.alt}
-                style={{ 
-                  width: block.content.width, 
-                  maxWidth: '100%',
-                  borderRadius: block.styles.borderRadius || '8px'
-                }}
-                className="transition-all duration-200 hover:shadow-lg"
-              />
-            ) : (
-              <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600">
-                <div className="text-center">
-                  <Image className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Click to add image</p>
-                </div>
+      return (
+        <div style={block.styles} className="p-4">
+          <input
+            type="file"
+            accept="image/*"
+            id={`file-upload-${block.id}`}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  updateBlock(block.id, {
+                    content: {
+                      ...block.content,
+                      src: reader.result,
+                      alt: file.name,
+                    },
+                  });
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          
+          {block.content.src ? (
+            <img
+              src={block.content.src}
+              alt={block.content.alt}
+              style={{
+                width: block.content.width,
+                maxWidth: '100%',
+                borderRadius: block.styles.borderRadius || '8px',
+                cursor: 'pointer',
+              }}
+              className="transition-all duration-200 hover:shadow-lg"
+              onClick={() => {
+                document.getElementById(`file-upload-${block.id}`)?.click();
+              }}
+            />
+          ) : (
+            <div
+              className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 cursor-pointer"
+              onClick={() => {
+                document.getElementById(`file-upload-${block.id}`)?.click();
+              }}
+            >
+              <div className="text-center">
+                <Image className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Click to add image</p>
               </div>
-            )}
-          </div>
-        );
+            </div>
+          )}
+        </div>
+      );
+
       case 'button':
         return (
           <div style={block.styles} className="p-4">
@@ -689,11 +758,11 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
 
   return (
       <DndProvider backend={HTML5Backend}>
-        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="flex h-[85vh] bg-gray-50 dark:bg-gray-900">
           {/* Sidebar */}
           <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={() => navigate('/newsletter')}
@@ -741,40 +810,44 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
               </div>
 
               {/* Preview Mode Selector */}
-              <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+              {/* <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setPreviewMode('desktop')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors ${
+                  className={`flex items-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${
                     previewMode === 'desktop' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <Monitor className="w-4 h-4" />
+                  <Monitor className="w-[14px] h-4" />
                   <span>Desktop</span>
                 </button>
                 <button
                   onClick={() => setPreviewMode('tablet')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors ${
+                  className={`flex items-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${
                     previewMode === 'tablet' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <Tablet className="w-4 h-4" />
+                  <Tablet className="w-[14px] h-4" />
                   <span>Tablet</span>
                 </button>
                 <button
                   onClick={() => setPreviewMode('mobile')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors ${
+                  className={`flex items-center space-x-1 px-3 py-2 rounded text-sm transition-colors ${
                     previewMode === 'mobile' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
-                  <Smartphone className="w-4 h-4" />
+                  <Smartphone className="w-[14px] h-4" />
                   <span>Mobile</span>
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Components */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Components</h3>
+            <div className="flex-1 overflow-y-auto px-6">
+            
+            <h3 className="sticky top-0 z-10 bg-white dark:bg-gray-800 text-sm font-medium text-gray-900 dark:text-white mb-4 py-2">
+              Components
+            </h3>
+
               
               {/* Group components by category */}
               {['Content', 'Media', 'Interactive', 'Layout', 'Advanced'].map(category => {
@@ -819,8 +892,11 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
 
             {/* Block Settings */}
             {selectedBlock && (
-              <div className="border-t border-gray-200 dark:border-gray-700 p-6 max-h-96 overflow-y-auto">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Block Settings</h3>
+              <div id="block-settings" className="border-t border-gray-200 dark:border-gray-700 px-6 h-1/3 overflow-y-auto">
+                
+                <h3 className="sticky top-0 z-10 bg-white dark:bg-gray-800 text-sm font-medium text-gray-900 dark:text-white mb-4 p-2">
+                  Block Settings
+                </h3>
                 <BlockSettings
                   block={blocks.find(b => b.id === selectedBlock)!}
                   onUpdate={(updates) => updateBlock(selectedBlock, updates)}
@@ -832,71 +908,94 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
           {/* Main Editor */}
           <div className="flex-1 flex flex-col">
             {/* Top Toolbar */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setZoom(Math.max(50, zoom - 10))}
-                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                      title="Zoom Out"
-                    >
-                      <Minimize className="w-4 h-4" />
-                    </button>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[60px] text-center">
-                      {zoom}%
-                    </span>
-                    <button
-                      onClick={() => setZoom(Math.min(200, zoom + 10))}
-                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                      title="Zoom In"
-                    >
-                      <Maximize className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-                  
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {blocks.length} block{blocks.length !== 1 ? 's' : ''}
+            
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <div className="max-w-6xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              
+              {/* Left: Zoom + Block Count */}
+              <div className="flex items-center space-x-4 flex-1 lg:justify-start">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setZoom(Math.max(50, zoom - 10))}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Zoom Out"
+                  >
+                    <Minimize className="w-4 h-4" />
+                  </button>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[60px] text-center">
+                    {zoom}%
                   </span>
+                  <button
+                    onClick={() => setZoom(Math.min(200, zoom + 10))}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Zoom In"
+                  >
+                    <Maximize className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={handlePreview}
-                    className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {blocks.length} block{blocks.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              {/* Center: Preview Mode Dropdown */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative inline-block">
+                  <select
+                    value={previewMode}
+                    onChange={(e) => setPreviewMode(e.target.value as 'desktop' | 'tablet' | 'mobile')}
+                    className="text-sm font-medium px-4 py-2 text-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-sm"
                   >
-                    <Eye className="w-4 h-4" />
-                    <span>Preview</span>
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={isLoading}
-                    className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4" />
-                    )}
-                    <span>{isLoading ? 'Saving...' : 'Save'}</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/newsletter/create-campaign')}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Send</span>
-                  </button>
+                    <option value="desktop">Desktop</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="mobile">Mobile</option>
+                  </select>
                 </div>
               </div>
+
+              {/* Right: Action Buttons */}
+              <div className="flex items-center space-x-3 flex-1 lg:justify-end">
+                <button
+                  onClick={handlePreview}
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Preview</span>
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isLoading}
+                  className="flex items-center space-x-2 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  <span>{isLoading ? 'Saving...' : 'Save'}</span>
+                </button>
+                <button
+                  onClick={() => navigate('/newsletter/create-campaign')}
+                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Send</span>
+                </button>
+              </div>
+
             </div>
+          </div>
+
+
 
             {/* Canvas */}
             <div className="flex-1 overflow-auto p-8 bg-gray-100 dark:bg-gray-900">
               <div className="flex justify-center">
                 <div
+                  id="email-canvas"
                   style={{ 
                     width: getPreviewWidth(),
                     maxWidth: '100%',
@@ -906,14 +1005,24 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
                   }}
                   className="shadow-xl rounded-lg overflow-hidden"
                 >
-                  {blocks.map((block, index) => (
+                  {/* {blocks.map((block, index) => (
                     <DraggableBlock key={block.id} block={block} index={index} />
+                  ))} */}
+                  {blocks.map((block, index) => (
+                    <DraggableBlock 
+                      key={block.id} 
+                      block={block} 
+                      index={index} 
+                      selectedBlock={selectedBlock} 
+                      setSelectedBlock={setSelectedBlock} 
+                    />
                   ))}
+
                   
                   {blocks.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-96 text-gray-500 dark:text-gray-400">
-                      <div className="w-24 h-24 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800 rounded-full flex items-center justify-center mb-6">
-                        <Plus className="w-12 h-12 text-emerald-600 dark:text-emerald-400" />
+                      <div className="w-18 h-18 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-emerald-900 dark:to-emerald-800 rounded-full flex items-center justify-center mb-3">
+                        <Plus className="w-12 h-12 text-emerald-300 dark:text-emerald-400" />
                       </div>
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                         Start Building Your Email
@@ -923,7 +1032,7 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
                       </p>
                       <button
                         onClick={() => setShowTemplates(true)}
-                        className="mt-6 flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                        className="mt-6 flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                       >
                         <Layers className="w-4 h-4" />
                         <span>Choose Template</span>

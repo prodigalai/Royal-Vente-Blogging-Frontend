@@ -35,7 +35,7 @@ const Header: React.FC = () => {
     setSite(newSite);
     setIsSiteMenuOpen(false);
     // Navigate to the home of the selected site:
-    navigate(newSite === "blog" ? "/blog/home" : "/newsletter");
+    navigate(newSite === "blog" ? "/home" : "/newsletter");
   };
 
   return (

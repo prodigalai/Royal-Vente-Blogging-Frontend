@@ -55,6 +55,8 @@ import { SiteProvider } from "./contexts/SiteContext";
 import EmailBuilderPage from "./components/Newsletter/EmailBuilderPage";
 import TemplatesTab from "./components/Newsletter/TemplatesTab";
 import SubscriberManagement from "./components/Newsletter/SubscriberManagement";
+import SocialMediaTab from "./components/Newsletter/SocialMediaTab";
+import AnalyticsTab from "./components/Newsletter/AnalyticsTab";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -104,6 +106,8 @@ const AppRoutes: React.FC = () => {
         <Route path="newsletter" element={<Newsletter />} />
         <Route path="/capabilities" element={<CapabilitiesPage />} />
         <Route path="/newsletter/create" element={<CreateNewsletter />} />
+        <Route path="/newsletter/social" element={<SocialMediaTab />} />
+        <Route path="/newsletter/analytics" element={<AnalyticsTab />} />
         <Route path="email-builder" element={< EmailBuilderPage />} />
 
         <Route path="temlplets" element={<TemplatesTab />} />

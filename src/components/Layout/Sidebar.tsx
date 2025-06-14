@@ -11,6 +11,8 @@ import {
   ChevronDown,
   Mail,
   LayoutList,
+  Share2,
+  TrendingUp
 } from "lucide-react";
 import { useSite } from "../../contexts/SiteContext";
 
@@ -26,6 +28,8 @@ const navItems = {
     { name: "Email Builder", href: "email-builder", icon: Mail },
     { name: "Templates", href: "temlplets", icon: LayoutList },
     { name: "Create Newsletter", href: "/newsletter/create", icon: PenTool },
+    { name: "Social Media", href: "/newsletter/social", icon: Share2 },
+    { name: "Analytics Dashboard", href: "/newsletter/analytics", icon: TrendingUp },
   ],
 } as const;
 

@@ -73,7 +73,7 @@ const CreateCampaign: React.FC = () => {
   const selectedTemplate = templates.find(t => t.id === formData.template);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-8">
         <button
@@ -89,9 +89,13 @@ const CreateCampaign: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> */}
+        {/* <div className="flex flex-col lg:flex-row gap-6"> */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
           {/* Main Form */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* <div className="lg:col-span-2 space-y-6"> */}
+            {/* <div className="flex-grow space-y-6"> */}
+            <div className="space-y-6">
             {/* Campaign Details */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Campaign Details</h3>
@@ -374,7 +378,9 @@ const CreateCampaign: React.FC = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          {/* <div className="space-y-6"> */}
+            {/* <div className="w-full lg:w-[300px] lg:sticky top-[80px] h-fit space-y-6"> */}
+              <div className="space-y-6 lg:sticky lg:top-24 h-fit">
             {/* Scheduling */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduling</h3>
@@ -515,23 +521,26 @@ const CreateCampaign: React.FC = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        {/* <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700"> */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-4 z-50 shadow-md">
+        <div className="max-w-6xl mx-auto flex justify-end space-x-4">
+
           <button
             type="button"
             onClick={() => navigate('/newsletter')}
-            className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
-            className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Save Draft
           </button>
           <button
             type="submit"
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             {formData.scheduleType === 'now' ? (
               <>
@@ -546,6 +555,8 @@ const CreateCampaign: React.FC = () => {
             )}
           </button>
         </div>
+        </div>
+        <div className="h-12" />
       </form>
     </div>
   );
