@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 type SidebarType = "help" | "profile";
 
@@ -45,10 +45,26 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     { key: "Terms", label: "Terms" },
   ];
 
+  const [openPopoverIndex, setOpenPopoverIndex] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest(".popover-parent")) {
+        setOpenPopoverIndex(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   return (
-    <div className="fixed top-12 right-0 w-[30rem] py-16 pl-6 min-h-screen border-l border-gray-200 bg-white flex flex-col justify-between dark:bg-gray-900 dark:border-gray-700">
+    // <div className="fixed top-12 right-0 w-[30rem] py-16 pl-6 min-h-screen border-l border-gray-200 bg-white flex flex-col justify-between dark:bg-gray-900 dark:border-gray-700">
+    <div className="fixed top-12 right-0 w-[30rem] h-[calc(100vh-3rem)] overflow-y-auto  pl-6 py-8 border-l border-gray-200 bg-white flex flex-col dark:bg-gray-900 dark:border-gray-700">
       {/* Content Section */}
-      <div className="mb-6">
+      <div className="mb-6 max-w-xs w-full ">
         {type === "help" ? (
           <>
             <h3 className="text-lg font-semibold text-gray-900 mb-4 dark:text-white">
@@ -124,8 +140,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       </h4>
       <ul className="space-y-3">
         {followingList.map((person, index) => (
-          <li key={index} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <li key={index} className="flex items-center justify-between relative group">
+            {/* <div className="flex items-center space-x-2">
               <img
                 src={person.avatar}
                 alt={person.name}
@@ -134,9 +150,61 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               <span className="text-sm text-gray-800 dark:text-gray-100">
                 {person.name}
               </span>
-            </div>
-            {/* Three-dot icon (you can replace this with an actual icon if needed) */}
-            <span className="text-gray-400">•••</span>
+            </div> */}
+            <Link
+              to={`/profile/${person.name.toLowerCase().replace(/\s+/g, "")}`}
+              className="flex items-center space-x-2 hover:underline"
+            >
+              <img
+                src={person.avatar}
+                alt={person.name}
+                className="w-7 h-7 rounded-full"
+              />
+              <span className="text-sm text-gray-800 dark:text-gray-100">
+                {person.name}
+              </span>
+            </Link>
+
+            <span
+              className="text-gray-400 cursor-pointer relative"
+              onClick={() =>
+                setOpenPopoverIndex(openPopoverIndex === index ? null : index)
+              }
+            >
+              •••
+              {openPopoverIndex === index && (
+                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-50 w-72 p-6
+                bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-gray-200 dark:border-gray-700 ">
+                  <div className="flex items-center mb-3 justify-between">
+                    <img
+                      src={person.avatar}
+                      alt={person.name}
+                      className="w-16 h-16 rounded-full"
+                    />
+                    <button className="mt-4 px-4 py-1.5 text-sm border border-black dark:border-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-black dark:text-white">
+                      Follow
+                    </button>
+                  </div>
+                    <div>
+                      <p className="font-semibold text-base font-sans mb-1 text-gray-900 dark:text-white">
+                        {person.name}
+                      </p>
+                      {/* <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                        {Math.floor(Math.random() * 1000) + 100} followers
+                      </p> */}
+                      <span className="text-sm text-gray-800 dark:text-gray-300 mb-2">
+                        {(person.followers ?? Math.floor(Math.random() * 1000) + 100).toLocaleString()} 
+                      </span>
+                        <span className="text-gray-500"> followers</span>
+                    </div>
+                  <p className="text-[13px] text-gray-800 dark:text-gray-300 mt-3">
+                    Bestselling author of seven books, including *Digital Minimalism*. Associate professor of computer science at Georgetown University.
+                  </p>
+                  
+                </div>
+              )}
+            </span>
+
           </li>
         ))}
       </ul>

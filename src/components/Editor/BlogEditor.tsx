@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { EditorToolbar } from "./EditorToolbar"
 import { ArticleHeader } from "./ArticleHeader"
 import { RichTextEditor } from "./RichTextEditor"
@@ -170,6 +170,10 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ initialArticle, onSave, 
     }
   }
 
+  const canPublish = useMemo(() => {
+    return article.title.trim() !== "" || article.content.trim() !== "";
+  }, [article.title, article.content]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="w-full mx-auto px-4">
@@ -178,6 +182,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ initialArticle, onSave, 
           onSave={handleManualSave}
           isDraft={article.isDraft}
           isSaving={isSaving}
+          canPublish={canPublish}
+          userImage="https://i.pravatar.cc/300"
         />
 
         <div className="py-8">
