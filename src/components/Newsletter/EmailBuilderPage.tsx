@@ -429,22 +429,13 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
           handlerId: monitor.getHandlerId(),
         };
       },
-      hover(item: any, monitor) {
-        if (!ref.current) return;
+      drop(item: any, monitor) {
         const dragIndex = item.index;
         const hoverIndex = index;
         if (dragIndex === hoverIndex) return;
-        
-        const hoverBoundingRect = ref.current?.getBoundingClientRect();
-        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-        const clientOffset = monitor.getClientOffset();
-        const hoverClientY = clientOffset!.y - hoverBoundingRect.top;
-        
-        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
-        
+
         moveBlock(dragIndex, hoverIndex);
-        item.index = hoverIndex;
+        item.index = hoverIndex; 
       },
     });
 
@@ -469,7 +460,7 @@ const EmailBuilder: React.FC<EmailBuilderProps> = ({
       <div
         ref={ref}
         data-handler-id={handlerId}
-        style={{ opacity, cursor: 'move' }}
+        style={{ opacity }}
         className={`group relative border-2 border-dashed transition-all duration-200 ${
           selectedBlock === block.id 
             ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-lg' 
