@@ -227,7 +227,7 @@ const AutomationsTab: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Create Automation
               </button>
@@ -252,7 +252,7 @@ const AutomationsTab: React.FC = () => {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors shadow-lg hover:shadow-xl"
+          className="flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors shadow-lg hover:shadow-xl"
         >
           <Plus className="w-4 h-4" />
           <span>Create Automation</span>

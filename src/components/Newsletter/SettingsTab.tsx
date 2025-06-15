@@ -39,7 +39,7 @@ const SettingsTab: React.FC = () => {
         </div>
         <button 
           onClick={handleSaveSettings}
-          className="flex items-center space-x-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors shadow-lg hover:shadow-xl"
+          className="flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors shadow-lg hover:shadow-xl"
         >
           <Save className="w-4 h-4" />
           <span>Save Settings</span>
