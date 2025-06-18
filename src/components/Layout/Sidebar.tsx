@@ -19,7 +19,7 @@ import { useSite } from "../../contexts/SiteContext";
 const navItems = {
   blog: [
     { name: "Home", href: "/home", icon: Home },
-    { name: "All Posts", href: "/blog", icon: BookOpen },
+    // { name: "All Posts", href: "/blog", icon: BookOpen },
     { name: "Create Post", href: "/create", icon: PenTool },
     { name: "Drafts", href: "/drafts", icon: FileText },
   ],
