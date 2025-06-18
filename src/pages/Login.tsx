@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { BookOpen, Mail, Lock, AlertCircle, Sun, Moon } from 'lucide-react';
+import { useDispatch } from 'react-redux';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { setCredentials } from '../store/slices/authSlice';
+import { User } from '../types';
+import api from '../utils/axios';
 
 const Login: React.FC = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,9 +28,24 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      const response = await api.post('/auth/login', { email, password });
+      const data = response.data;
+
+      if (!data.success || !data.data || !data.data.token) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store the token
+      localStorage.setItem('token', data.data.token);
+      // Dispatch the credentials to Redux store
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+      // Navigate to dashboard
+      navigate('/home', { replace: true });
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }

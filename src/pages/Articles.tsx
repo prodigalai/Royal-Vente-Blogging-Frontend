@@ -1,222 +1,193 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Eye, 
-  Heart, 
-  Clock, 
-  Search, 
-  Filter, 
-  Tag,
-  User,
-  BookOpen,
-  TrendingUp
-} from 'lucide-react';
-import { mockArticles } from '../utils/mockData';
-import { format } from 'date-fns';
 
-const Articles: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
 
-  // Get all unique tags
-  const allTags = Array.from(new Set(mockArticles.flatMap(article => article.tags)));
 
-  // Filter and sort articles
-  const filteredArticles = mockArticles
-    .filter(article => {
-      const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesTag = !selectedTag || article.tags.includes(selectedTag);
-      return matchesSearch && matchesTag;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'popular':
-          return b.views - a.views;
-        case 'trending':
-          return b.likes - a.likes;
-        default:
-          return new Date(b.publishedAt!).getTime() - new Date(a.publishedAt!).getTime();
-      }
+
+
+
+
+
+import React, { useState, useEffect } from "react";
+import { BookOpen, Clock, Eye, Heart } from "lucide-react";
+import ArticleCard from "../components/Article/ArticleCard";
+
+interface Article {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  tags: string[];
+  createdAt: string;
+  views_count: number;
+  likes: number;
+  readTime: number;
+}
+
+// Mock data representing the user's own posts
+const yourPosts: Article[] = [
+  {
+    _id: "a1",
+    title: "How I Built My First React App",
+    description:
+      "A step-by-step walkthrough of my journey building a React application from scratch.",
+    imageUrl: "https://picsum.photos/seed/your1/400/240",
+    tags: ["React", "JavaScript"],
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    views_count: 150,
+    likes: 25,
+    readTime: 4,
+  },
+  {
+    _id: "a2",
+    title: "Understanding TypeScript Generics",
+    description:
+      "An in-depth look at how generics work in TypeScript and why you’d use them.",
+    imageUrl: "https://picsum.photos/seed/your2/400/240",
+    tags: ["TypeScript", "Typing"],
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    views_count: 98,
+    likes: 12,
+    readTime: 6,
+  },
+  {
+    _id: "a3",
+    title: "Deploying Your Node.js App to Production",
+    description:
+      "Best practices for deploying and scaling a Node.js application in the cloud.",
+    imageUrl: "https://picsum.photos/seed/your3/400/240",
+    tags: ["Node.js", "Deployment"],
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    views_count: 84,
+    likes: 18,
+    readTime: 5,
+  },
+];
+
+// Helper to format date
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+const UserActivity: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState<"all" | "recent" | "popular" | "topLiked">(
+    "all"
+  );
+  const [filtered, setFiltered] = useState<Article[]>(yourPosts);
+
+  useEffect(() => {
+    let list = yourPosts.filter((p) => {
+      const matchSearch =
+        !searchTerm ||
+        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchSearch;
     });
+    if (activeTab === "recent") {
+      list = [...list].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } else if (activeTab === "popular") {
+      list = [...list].sort((a, b) => b.views_count - a.views_count);
+    } else if (activeTab === "topLiked") {
+      list = [...list].sort((a, b) => b.likes - a.likes);
+    }
+    setFiltered(list);
+  }, [searchTerm, activeTab]);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="max-w-8xl mx-auto p-6 space-y-8 font-sans text-gray-800">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Blogs</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Discover and explore our collection of Blogs
-          </p>
+      <header className="space-y-2">
+        <h1 className="text-4xl font-bold">Your Activity</h1>
+        <p className="text-gray-600">Review and manage the posts you’ve created.</p>
+      </header>
+
+      {/* Search & Create */}
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <div className="flex-1 min-w-[240px]">
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded-full focus:outline-none"
+            placeholder="Search your posts…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <div className="mt-4 md:mt-0">
-          <Link
-            to="/create"
-            className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
-          >
-            <BookOpen className="w-5 h-5" />
-            <span>Write Blogs</span>
-          </Link>
-        </div>
+        <button className="inline-flex items-center space-x-2 bg-[#005CEF] hover:bg-[#004BB5] text-white font-semibold px-5 py-2 rounded-full transition">
+          <BookOpen className="w-5 h-5" />
+          <span>Write a New Post</span>
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search blogs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Tag Filter */}
-          <div className="flex items-center space-x-2">
-            <Filter className="w-5 h-5 text-gray-400" />
-            <select
-              value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
-              className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">All Tags</option>
-              {allTags.map(tag => (
-                <option key={tag} value={tag}>{tag}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sort */}
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="w-5 h-5 text-gray-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'latest' | 'popular' | 'trending')}
-              className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="latest">Latest</option>
-              <option value="popular">Most Viewed</option>
-              <option value="trending">Most Liked</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Articles Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-        {filteredArticles.map((article) => (
-          <article
-            key={article.id}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all hover:scale-[1.02] group"
+      {/* Tabs */}
+      <nav className="flex space-x-6 border-b pb-3 text-gray-600">
+        {[
+          { key: "all", label: "All Posts" },
+          { key: "recent", label: "Recent" },
+          { key: "popular", label: "Top Views" },
+          { key: "topLiked", label: "Top Liked" },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key as any)}
+            className={`pb-2 transition ${
+              activeTab === key
+                ? "border-b-2 border-[#005CEF] text-[#005CEF] font-semibold"
+                : "hover:text-gray-800"
+            }`}
           >
-            {article.coverImage && (
-              <div className="aspect-video overflow-hidden rounded-t-xl">
-                <img
-                  src={article.coverImage}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-            )}
-            
-            <div className="p-6">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {article.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center space-x-1 px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-medium rounded-full"
-                  >
-                    <Tag className="w-3 h-3" />
-                    <span>{tag}</span>
-                  </span>
-                ))}
-              </div>
-
-              {/* Title */}
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                {article.title}
-              </h2>
-
-              {/* Excerpt */}
-              <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-                {article.excerpt}
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center space-x-3 mb-4">
-                {article.author.avatar ? (
-                  <img
-                    src={article.author.avatar}
-                    alt={article.author.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {article.author.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {format(new Date(article.publishedAt!), 'MMM d, yyyy')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center space-x-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{article.views}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Heart className="w-4 h-4" />
-                    <span>{article.likes}</span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400">
-                  <Clock className="w-4 h-4" />
-                  <span>{article.readTime} min read</span>
-                </div>
-              </div>
-            </div>
-          </article>
+            {label}
+          </button>
         ))}
-      </div>
+      </nav>
 
-      {/* Empty State */}
-      {filteredArticles.length === 0 && (
-        <div className="text-center py-12">
-          <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            No articles found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Try adjusting your search or filter criteria.
-          </p>
-          <Link
-            to="/create"
-            className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105"
-          >
-            <BookOpen className="w-5 h-5" />
-            <span>Write the first article</span>
-          </Link>
-        </div>
-      )}
+      {/* Posts List */}
+      <ul className="space-y-8">
+        {filtered.length === 0 ? (
+          <li className="text-center text-gray-500 py-16">No posts match your search.</li>
+        ) : (
+          filtered.map((post) => (
+            <li
+              key={post._id}
+              className="flex flex-col md:flex-row gap-4 hover:bg-gray-50 p-4 rounded-lg transition"
+            >
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full md:w-44 h-28 object-cover rounded-lg flex-shrink-0"
+              />
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold hover:underline cursor-pointer">
+                    {post.title}
+                  </h2>
+                  <p className="text-gray-700 line-clamp-2 mt-1">{post.description}</p>
+                </div>
+                <div className="flex flex-wrap items-center text-sm text-gray-500 mt-3 gap-4">
+                  <span className="flex items-center space-x-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{formatDate(post.createdAt)}</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Eye className="w-4 h-4" />
+                    <span>{post.views_count} reads</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Heart className="w-4 h-4" />
+                    <span>{post.likes} likes</span>
+                  </span>
+                  <span>· {post.readTime} min read</span>
+                </div>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
 };
 
-export default Articles;
+export default UserActivity;

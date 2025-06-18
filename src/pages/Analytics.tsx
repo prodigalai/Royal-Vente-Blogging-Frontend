@@ -220,10 +220,10 @@ const Analytics: React.FC = () => {
         </div>
       </div>
 
-      {/* Top Performing Articles */}
+      {/* Top Performing Blogs */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Top Performing Articles</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Top Performing Blogs</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

@@ -1,6 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { AuthContextType, User, Organization, RegisterData } from '../types';
-import { mockUsers, mockOrganizations, mockOrganizationMembers } from '../utils/mockData';
+import { setCredentials, logout as logoutAction, updateUser as updateUserAction } from '../store/slices/authSlice';
+import { RootState } from '../store';
+import api from '../utils/axios';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -17,92 +20,75 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    const savedOrg = localStorage.getItem('currentOrganization');
-    
-    if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      if (savedOrg) {
-        setOrganization(JSON.parse(savedOrg));
-      } else if (userData.organizationId) {
-        const userOrg = mockOrganizations.find(org => org.id === userData.organizationId);
-        if (userOrg) {
-          setOrganization(userOrg);
-          localStorage.setItem('currentOrganization', JSON.stringify(userOrg));
-        }
-      }
-    }
-  }, []);
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const [organization, setOrganization] = React.useState<Organization | null>(null);
 
   const login = async (email: string, password: string) => {
-    const foundUser = mockUsers.find(u => u.email === email);
-    
-    if (!foundUser) {
-      throw new Error('Invalid credentials');
-    }
-
-    setUser(foundUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('currentUser', JSON.stringify(foundUser));
-    
-    if (foundUser.organizationId) {
-      const userOrg = mockOrganizations.find(org => org.id === foundUser.organizationId);
-      if (userOrg) {
-        setOrganization(userOrg);
-        localStorage.setItem('currentOrganization', JSON.stringify(userOrg));
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const data = response.data;
+      if (!data.success || !data.data || !data.data.token) {
+        throw new Error(data.message || 'Login failed');
       }
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+    } catch (error: any) {
+      throw error;
     }
   };
 
   const logout = () => {
-    setUser(null);
+    dispatch(logoutAction());
     setOrganization(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('currentOrganization');
+    localStorage.removeItem('token');
   };
 
   const register = async (userData: RegisterData) => {
-    const newUser: User = {
-      id: `user_${Date.now()}`,
-      email: userData.email,
-      name: userData.name,
-      role: userData.role || 'author',
-      createdAt: new Date().toISOString(),
-    };
-
-    mockUsers.push(newUser);
-    setUser(newUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-  };
-
-  const switchOrganization = (organizationId: string) => {
-    const org = mockOrganizations.find(o => o.id === organizationId);
-    if (org) {
-      setOrganization(org);
-      localStorage.setItem('currentOrganization', JSON.stringify(org));
+    try {
+      const response = await api.post('/auth/register', userData);
+      const data = response.data;
+      if (!data.success || !data.data || !data.data.token) {
+        throw new Error(data.message || 'Registration failed');
+      }
+      dispatch(setCredentials({
+        user: data.data.user,
+        token: data.data.token
+      }));
+    } catch (error: any) {
+      throw error;
     }
   };
 
+  const switchOrganization = async (organizationId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.get(`/organizations/${organizationId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.status === 200) {
+        setOrganization(response.data);
+      }
+    } catch (error) {
+      console.error('Error switching organization:', error);
+    }
+  };
+
+  const value = {
+    user,
+    organization,
+    isAuthenticated,
+    login,
+    logout,
+    register,
+    switchOrganization,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      organization,
-      isAuthenticated,
-      login,
-      logout,
-      register,
-      switchOrganization,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

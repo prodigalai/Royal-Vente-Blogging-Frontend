@@ -1,274 +1,185 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  TrendingUp, 
-  Users, 
-  BookOpen, 
-  PenTool, 
-  Eye, 
-  Heart, 
-  Clock, 
   ArrowRight,
   Star,
-  Calendar
+  Clock,
+  TrendingUp,
+  BookOpen,
+  Users,
+  Building2,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { mockArticles } from '../utils/mockData';
-import { format } from 'date-fns';
+import {mockArticles, mockOrganizations, mockTags } from '../data/mockData';
+import ArticleCard from '../components/Article/ArticleCard';
 
-const Dashboard: React.FC = () => {
-  const { user, organization } = useAuth();
+const featuredArticle = mockArticles[0];
 
-  const stats = [
-    {
-      name: 'Total Articles',
-      value: '12',
-      change: '+4.75%',
-      changeType: 'positive',
-      icon: BookOpen,
-    },
-    {
-      name: 'Total Views',
-      value: '2,760',
-      change: '+12.02%',
-      changeType: 'positive',
-      icon: Eye,
-    },
-    {
-      name: 'Total Likes',
-      value: '105',
-      change: '+8.15%',
-      changeType: 'positive',
-      icon: Heart,
-    },
-    {
-      name: 'Reading Time',
-      value: '24 min',
-      change: 'avg',
-      changeType: 'neutral',
-      icon: Clock,
-    },
-  ];
+const UserDashboard: React.FC = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('featured');
+  const [currentIndex, setCurrentIndex] = useState(0);
+const featuredArticles = mockArticles.slice(0, 5); // or however many you want to rotate
 
-  const recentArticles = mockArticles.slice(0, 3);
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % featuredArticles.length);
+  }, 3000); // change slide every 5 seconds
+
+  return () => clearInterval(interval); // cleanup on unmount
+}, [featuredArticles.length]);
+
+
+  const otherArticles = mockArticles.slice(1);
+
+  const getTabArticles = () => {
+    switch (activeTab) {
+      case 'recent':
+        return [...mockArticles].sort((a, b) => b?.publishedAt?.getTime() - a?.publishedAt?.getTime());
+      case 'trending':
+        return [...mockArticles].sort((a, b) => b.likes - a.likes);
+      default:
+        return mockArticles;
+    }
+  };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-2xl p-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              Welcome back, {user?.name}!
-            </h1>
-            <p className="text-primary-100 text-lg mb-4">
-              Ready to create something amazing today?
-            </p>
-            {organization && (
-              <div className="flex items-center space-x-2 text-primary-100">
-                <span className="text-sm">Working with</span>
-                <span className="font-semibold text-white">{organization.name}</span>
-              </div>
-            )}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main Content */}
+      <div className="lg:col-span-2">
+        {/* Featured Article */}
+        <section className="mb-12">
+          <div className="flex items-center space-x-2 mb-6">
+            <Star className="w-5 h-5 text-primary-600" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Featured Story</h2>
           </div>
-          <div className="hidden md:block">
-            <Link
-              to="/create"
-              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl px-6 py-3 text-white font-medium transition-all hover:scale-105 hover:shadow-lg"
-            >
-              <div className="flex items-center space-x-2">
-                <PenTool className="w-5 h-5" />
-                <span>Write Article</span>
-              </div>
-            </Link>
+          <ArticleCard article={featuredArticles[currentIndex]} variant="featured" />
+        </section>
+
+        {/* Article Tabs */}
+        <section>
+          <div className="flex items-center space-x-6 mb-8 border-b border-gray-200 dark:border-gray-700">
+            {[
+              { key: 'featured', label: 'Featured', icon: Star },
+              { key: 'recent', label: 'Recent', icon: Clock },
+              { key: 'trending', label: 'Trending', icon: TrendingUp },
+            ].map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key as any)}
+                className={`flex items-center space-x-2 pb-4 border-b-2 transition-all duration-200 ${
+                  activeTab === key
+                    ? 'border-primary-600 text-primary-600'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="font-medium">{label}</span>
+              </button>
+            ))}
           </div>
-        </div>
+
+          <div className="space-y-8">
+            {getTabArticles().map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </section>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.name}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all hover:scale-105"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {stat.name}
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {stat.value}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center">
-                <TrendingUp className={`w-4 h-4 mr-1 ${
-                  stat.changeType === 'positive' 
-                    ? 'text-green-500' 
-                    : stat.changeType === 'negative' 
-                    ? 'text-red-500' 
-                    : 'text-gray-500'
-                }`} />
-                <span className={`text-sm font-medium ${
-                  stat.changeType === 'positive' 
-                    ? 'text-green-600' 
-                    : stat.changeType === 'negative' 
-                    ? 'text-red-600' 
-                    : 'text-gray-600'
-                }`}>
-                  {stat.change}
-                </span>
-                <span className="text-sm text-gray-500 ml-1">
-                  {stat.changeType !== 'neutral' && 'from last month'}
-                </span>
-              </div>
+      {/* Sidebar */}
+      <div className="lg:col-span-1">
+        <div className="sticky top-24 space-y-8">
+          {/* Trending Topics */}
+          <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center space-x-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-primary-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Trending Topics</h3>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Articles */}
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Articles</h2>
+            <div className="space-y-3">
+              {mockTags.slice(0, 6).map((tag) => (
                 <Link
-                  to="/articles"
-                  className="flex items-center space-x-1 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
+                  key={tag.id}
+                  to={`/tag/${tag.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="block group p-3 rounded-lg hover:bg-white dark:hover:bg-gray-600 transition-all duration-200"
                 >
-                  <span>View all</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-600 font-medium transition-colors">
+                      {tag.name}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      20000000
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    10k followers
+                  </p>
                 </Link>
-              </div>
+              ))}
             </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {recentArticles.map((article) => (
-                <div key={article.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className="flex items-start space-x-4">
-                    {article.coverImage && (
+            <Link
+              to="/tags"
+              className="inline-flex items-center space-x-1 text-primary-600 hover:text-primary-600 dark:text-primary-600 dark:hover:text-primary-600 font-medium mt-4 transition-colors"
+            >
+              <span>See all topics</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </section>
+
+          {/* Featured Organizations */}
+          <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center space-x-2 mb-4">
+              <Building2 className="w-5 h-5 text-primary-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Featured Organizations</h3>
+            </div>
+            <div className="space-y-4">
+              {mockOrganizations.slice(0, 3).map((org) => (
+                <div key={org.id} className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                  <div className="flex items-center space-x-3">
+                    {org.logo && (
                       <img
-                        src={article.coverImage}
-                        alt={article.title}
-                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                        src={org.logo}
+                        alt={org.name}
+                        className="w-10 h-10 rounded-lg object-cover"
                       />
                     )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                        {article.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3">
-                        {article.excerpt}
-                      </p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center space-x-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{article.views}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Heart className="w-4 h-4" />
-                          <span>{article.likes}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{format(new Date(article.publishedAt!), 'MMM d')}</span>
-                        </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-600 transition-colors">
+                        {org.name}
+                      </h4>
+                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <BookOpen className="w-3 h-3" />
+                          <span>{org.articlesCount}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Users className="w-3 h-3" />
+                          <span>{org.members.length}</span>
+                        </span>
                       </div>
                     </div>
                   </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                    {org.description}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </section>
 
-        {/* Quick Actions & Activity */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Link
-                to="/create"
-                className="flex items-center space-x-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors group"
-              >
-                <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <PenTool className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Write Article</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Create new content</p>
-                </div>
-              </Link>
-              
-              <Link
-                to="/drafts"
-                className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group"
-              >
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">View Drafts</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Continue writing</p>
-                </div>
-              </Link>
-            </div>
-          </div>
-
-          {/* Activity Feed */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+          {/* Reading Recommendation */}
+          <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recommended for you</h3>
             <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <p className="text-sm text-gray-900 dark:text-white">Article published</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <p className="text-sm text-gray-900 dark:text-white">New follower</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">4 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <p className="text-sm text-gray-900 dark:text-white">Draft saved</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Yesterday</p>
-                </div>
-              </div>
+              {otherArticles.slice(0, 3).map((article) => (
+                <ArticleCard key={article.id} article={article} variant="compact" />
+              ))}
             </div>
-          </div>
-
-          {/* Performance Badge */}
-          <div className="bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl p-6 text-white">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">Great job!</h3>
-                <p className="text-accent-100 text-sm">
-                  Your articles are performing well this month
-                </p>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

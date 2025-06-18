@@ -109,13 +109,35 @@ const Tags: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Saved</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tags</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Organize and manage your saved content
+            Organize and manage your content tags
           </p>
+        </div>
+        <div className="mt-4 md:mt-0">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 hover:shadow-lg"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Create Tag</span>
+          </button>
         </div>
       </div>
 
+      {/* Search */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search tags..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+          />
+        </div>
+      </div>
 
       {/* Tags Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,33 +1,67 @@
-import React, { useState } from 'react';
-import { 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Globe, 
-  Database,
-  Key,
-  Mail,
-  Smartphone,
-  Download,
-  Trash2,
-  Save,
-  Eye,
-  EyeOff
-} from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { useState, useEffect } from "react";
+import {
+  User,
+  CheckCircle2,
+  XCircle,
+  ExternalLink,
+  ChevronRight,
+} from "lucide-react";
+import ProfileModal from "../components/Modal/ProfileUpdate";
+
+interface UserData {
+  _id: string;
+  username: string;
+  displayName: string;
+  email: string;
+  avatarUrl: string;
+  bio: string;
+  emailVerified: boolean;
+  personalBlogSlug: string;
+  systemRole: string;
+  prodigalCredits: number;
+  royalVenteCredits: number;
+  orgMemberships: Array<{
+    org: string;
+    orgSlug: string;
+    role: string;
+    permissions: {
+      content: {
+        create: boolean;
+        edit: boolean;
+        publish: boolean;
+        delete: boolean;
+        moderate: boolean;
+      };
+      users: {
+        manage: boolean;
+        invite: boolean;
+      };
+      settings: {
+        platform: boolean;
+        organization: boolean;
+      };
+    };
+    _id: string;
+  }>;
+  createdAt: string;
+  verificationExpire: string;
+  verificationToken: string;
+}
 
 const Settings: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState('profile');
-  const [showPassword, setShowPassword] = useState(false);
+  // const { theme, toggleTheme } = useTheme();
+  const [activeTab, setActiveTab] = useState("account");
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsmodalOpen] = useState(false);
   const [settings, setSettings] = useState({
     profile: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      bio: 'Passionate writer and technology enthusiast.',
-      website: 'https://johndoe.com',
-      location: 'San Francisco, CA'
+      displayName: "",
+      email: "",
+      bio: "",
+      avatarUrl: "",
+      personalBlogSlug: "",
     },
     notifications: {
       emailNotifications: true,
@@ -36,569 +70,667 @@ const Settings: React.FC = () => {
       newFollowers: true,
       articleLikes: true,
       comments: true,
-      mentions: false
+      mentions: false,
+      digestFrequency: "daily",
     },
     privacy: {
-      profileVisibility: 'public',
+      profileVisibility: "public",
       showEmail: false,
-      showLocation: true,
       allowIndexing: true,
-      twoFactorAuth: false
+      twoFactorAuth: false,
     },
-    preferences: {
-      language: 'en',
-      timezone: 'America/Los_Angeles',
-      dateFormat: 'MM/DD/YYYY',
-      autoSave: true,
-      darkMode: theme === 'dark'
-    }
+    publishing: {
+      allowPrivateNotes: true,
+      enableTipping: false,
+      allowEmailReplies: true,
+      replyToEmail: "",
+    },
   });
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy & Security', icon: Shield },
-    { id: 'preferences', label: 'Preferences', icon: Palette },
-    { id: 'data', label: 'Data & Export', icon: Database }
+    { id: "account", label: "Account" },
+    { id: "publishing", label: "Publishing" },
+    { id: "notifications", label: "Notifications" },
+    { id: "membership", label: "Membership and payment" },
+    { id: "security", label: "Security and apps" },
   ];
 
-  const handleSave = () => {
-    console.log('Saving settings:', settings);
-    // Show success message
-  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(
+          "https://royal-vente-blogging-system.onrender.com/api/v1/users/me",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setUserData(data.user);
+        setSettings((prev) => ({
+          ...prev,
+          profile: {
+            displayName: data.user.displayName,
+            email: data.user.email,
+            bio: data.user.bio,
+            avatarUrl: data.user.avatarUrl,
+            personalBlogSlug: data.user.personalBlogSlug,
+          },
+          publishing: {
+            ...prev.publishing,
+            replyToEmail: data.user.email,
+          },
+        }));
+      } catch (error) {
+        setError("Failed to fetch user data");
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleExportData = () => {
-    console.log('Exporting user data...');
-    // Implement data export
-  };
+    fetchUserData();
+  }, []);
 
-  const handleDeleteAccount = () => {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      console.log('Deleting account...');
-      // Implement account deletion
+  const handleDeleteAccount = async () => {
+    if (
+      confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      try {
+        const response = await fetch(
+          "https://royal-vente-blogging-system.onrender.com/api/v1/users/me",
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete account");
+        }
+
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        setError("Failed to delete account");
+      }
     }
   };
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Manage your account settings and preferences
-        </p>
-      </div>
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+  }: {
+    checked: boolean;
+    onChange: () => void;
+  }) => (
+    <button
+      onClick={onChange}
+      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+        checked ? "bg-green-500" : "bg-gray-300"
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+          checked ? "translate-x-5" : "translate-x-0.5"
+        }`}
+      />
+    </button>
+  );
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
-        <div className="lg:w-64 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <nav className="space-y-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+  const SettingRow = ({
+    title,
+    description,
+    children,
+    onClick,
+  }: {
+    title: string;
+    description?: string;
+    children?: React.ReactNode;
+    onClick?: () => void;
+  }) => (
+    <div
+      className={`flex items-center justify-between py-6 border-b border-gray-100 last:border-b-0 ${
+        onClick ? "cursor-pointer hover:bg-gray-50" : ""
+      }`}
+      onClick={onClick}
+    >
+      <div className="flex-1">
+        <div className="text-gray-900 font-medium">{title}</div>
+        {description && (
+          <div className="text-gray-600 text-sm mt-1">{description}</div>
+        )}
+      </div>
+      <div className="flex items-center space-x-2">
+        {children}
+        {onClick && <ChevronRight className="w-4 h-4 text-gray-400" />}
+      </div>
+    </div>
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-400"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex flex-col w-[90%]">
+        <h1 className="text-3xl font-bold text-primary-700 mb-6">Settings</h1>
+
+        {/* Tab Navigation */}
+
+        <div className="flex items-center space-x-8 mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 pb-4 border-b-2 transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "border-primary-600 text-primary-600"
+                  : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+              }`}
+            >
+              <span className="font-medium">{tab.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Content */}
-        <div className="flex-1">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            {/* Profile Settings */}
-            {activeTab === 'profile' && (
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Profile Information</h2>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                      <User className="w-10 h-10 text-white" />
-                    </div>
-                    <div>
-                      <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                        Change Avatar
-                      </button>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        JPG, GIF or PNG. 1MB max.
-                      </p>
-                    </div>
+
+        <div>
+          {/* Account Tab */}
+          {activeTab === "account" && (
+            <div className="space-y-0">
+              <SettingRow
+                title="Email address"
+                children={
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">
+                      {settings.profile.email}
+                    </span>
+                    {userData?.emailVerified ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
                   </div>
+                }
+              />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.profile.name}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          profile: { ...prev.profile, name: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      />
-                    </div>
+              <SettingRow
+                title="Username and subdomain"
+                children={
+                  <span className="text-gray-600">@{userData?.username}</span>
+                }
+              />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={settings.profile.email}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          profile: { ...prev.profile, email: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              <SettingRow
+                title="Profile information"
+                description="Edit your photo, name, pronouns, short bio, etc."
+                children={
+                  <div className="flex items-center space-x-3">
+                    <span className="text-gray-600">
+                      {settings.profile.displayName}
+                    </span>
+                    {settings.profile.avatarUrl ? (
+                      <img
+                        src={settings.profile.avatarUrl}
+                        alt={settings.profile.displayName}
+                        className="w-8 h-8 rounded-full object-cover"
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Website
-                      </label>
-                      <input
-                        type="url"
-                        value={settings.profile.website}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          profile: { ...prev.profile, website: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.profile.location}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          profile: { ...prev.profile, location: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      />
-                    </div>
+                    ) : (
+                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-gray-600" />
+                      </div>
+                    )}
                   </div>
+                }
+                onClick={() => {
+                  setIsmodalOpen(true);
+                }}
+              />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Bio
-                    </label>
-                    <textarea
-                      value={settings.profile.bio}
-                      onChange={(e) => setSettings(prev => ({
+              <SettingRow
+                title="Profile design"
+                description="Customize the appearance of your profile."
+                onClick={() => {}}
+              />
+
+              <SettingRow
+                title="Custom domain"
+                description="Upgrade to a Medium Membership to redirect your profile URL to a domain like yourdomain.com."
+                children={<span className="text-gray-600">None</span>}
+                onClick={() => {}}
+              />
+
+              <SettingRow
+                title="Partner Program"
+                description="You are not enrolled in the Partner Program."
+                onClick={() => {}}
+              />
+
+              <SettingRow
+                title="Your Medium Digest frequency"
+                description="Adjust how often you see a new Digest."
+                children={
+                  <select
+                    value={settings.notifications.digestFrequency}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
                         ...prev,
-                        profile: { ...prev.profile, bio: e.target.value }
-                      }))}
-                      rows={4}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                      placeholder="Tell us about yourself..."
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+                        notifications: {
+                          ...prev.notifications,
+                          digestFrequency: e.target.value,
+                        },
+                      }))
+                    }
+                    className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  >
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                }
+              />
 
-            {/* Notifications Settings */}
-            {activeTab === 'notifications' && (
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Notification Preferences</h2>
-                
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Email Notifications</h3>
-                    
-                    
-                    
-                    {[
-                      { key: 'emailNotifications', label: 'Email notifications', description: 'Receive notifications via email' },
-                      { key: 'weeklyDigest', label: 'Weekly digest', description: 'Get a weekly summary of your activity' },
-                      { key: 'newFollowers', label: 'New followers', description: 'When someone follows you' },
-                      { key: 'articleLikes', label: 'Article likes', description: 'When someone likes your articles' },
-                      { key: 'comments', label: 'Comments', description: 'When someone comments on your articles' },
-                      { key: 'mentions', label: 'Mentions', description: 'When someone mentions you' }
-                    ].map((item) => (
-                      <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{item.label}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{item.description}</p>
-                        </div>
-                        <button
-                          onClick={() => setSettings(prev => ({
-                            ...prev,
-                            notifications: {
-                              ...prev.notifications,
-                              [item.key]: !prev.notifications[item.key as keyof typeof prev.notifications]
-                            }
-                          }))}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            settings.notifications[item.key as keyof typeof settings.notifications]
-                              ? 'bg-primary-600'
-                              : 'bg-gray-300 dark:bg-gray-600'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                              settings.notifications[item.key as keyof typeof settings.notifications]
-                                ? 'translate-x-6'
-                                : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+              <SettingRow
+                title="Refine recommendations"
+                description="Adjust recommendations by updating what you're following and more."
+                onClick={() => {}}
+              />
 
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Push Notifications</h3>
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Smartphone className="w-5 h-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Push notifications</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Receive push notifications on your device</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setSettings(prev => ({
-                          ...prev,
-                          notifications: { ...prev.notifications, pushNotifications: !prev.notifications.pushNotifications }
-                        }))}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          settings.notifications.pushNotifications ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                            settings.notifications.pushNotifications ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+              <SettingRow
+                title="Muted writers and publications"
+                onClick={() => {}}
+              />
 
-            {/* Privacy & Security Settings */}
-            {activeTab === 'privacy' && (
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Privacy & Security</h2>
-                
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Privacy Settings</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Profile visibility</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Control who can see your profile</p>
-                        </div>
-                        <select
-                          value={settings.privacy.profileVisibility}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            privacy: { ...prev.privacy, profileVisibility: e.target.value }
-                          }))}
-                          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        >
-                          <option value="public">Public</option>
-                          <option value="followers">Followers only</option>
-                          <option value="private">Private</option>
-                        </select>
-                      </div>
+              <SettingRow title="Blocked users" onClick={() => {}} />
 
-                      {[
-                        { key: 'showEmail', label: 'Show email address', description: 'Display your email on your public profile' },
-                        { key: 'showLocation', label: 'Show location', description: 'Display your location on your profile' },
-                        { key: 'allowIndexing', label: 'Allow search engine indexing', description: 'Let search engines index your profile and articles' }
-                      ].map((item) => (
-                        <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">{item.label}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{item.description}</p>
-                          </div>
-                          <button
-                            onClick={() => setSettings(prev => ({
-                              ...prev,
-                              privacy: {
-                                ...prev.privacy,
-                                [item.key]: !prev.privacy[item.key as keyof typeof prev.privacy]
-                              }
-                            }))}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                              settings.privacy[item.key as keyof typeof settings.privacy]
-                                ? 'bg-primary-600'
-                                : 'bg-gray-300 dark:bg-gray-600'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                                settings.privacy[item.key as keyof typeof settings.privacy]
-                                  ? 'translate-x-6'
-                                  : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Security</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <Key className="w-5 h-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">Change password</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Update your password regularly</p>
-                          </div>
-                        </div>
-                        <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                          Change
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <Shield className="w-5 h-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">Two-factor authentication</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setSettings(prev => ({
-                            ...prev,
-                            privacy: { ...prev.privacy, twoFactorAuth: !prev.privacy.twoFactorAuth }
-                          }))}
-                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            settings.privacy.twoFactorAuth
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                              : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
-                          }`}
-                        >
-                          {settings.privacy.twoFactorAuth ? 'Enabled' : 'Enable'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Preferences Settings */}
-            {activeTab === 'preferences' && (
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Preferences</h2>
-                
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Language
-                      </label>
-                      <select
-                        value={settings.preferences.language}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          preferences: { ...prev.preferences, language: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        <option value="de">German</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Timezone
-                      </label>
-                      <select
-                        value={settings.preferences.timezone}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          preferences: { ...prev.preferences, timezone: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="America/Los_Angeles">Pacific Time</option>
-                        <option value="America/Denver">Mountain Time</option>
-                        <option value="America/Chicago">Central Time</option>
-                        <option value="America/New_York">Eastern Time</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Date Format
-                      </label>
-                      <select
-                        value={settings.preferences.dateFormat}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          preferences: { ...prev.preferences, dateFormat: e.target.value }
-                        }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Dark mode</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Use dark theme across the application</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          toggleTheme();
-                          setSettings(prev => ({
-                            ...prev,
-                            preferences: { ...prev.preferences, darkMode: !prev.preferences.darkMode }
-                          }));
-                        }}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          settings.preferences.darkMode ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                            settings.preferences.darkMode ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Auto-save drafts</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Automatically save your work as you type</p>
-                      </div>
-                      <button
-                        onClick={() => setSettings(prev => ({
-                          ...prev,
-                          preferences: { ...prev.preferences, autoSave: !prev.preferences.autoSave }
-                        }))}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          settings.preferences.autoSave ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                            settings.preferences.autoSave ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Data & Export Settings */}
-            {activeTab === 'data' && (
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Data & Export</h2>
-                
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Export Your Data</h3>
-                    
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-blue-900 dark:text-blue-100">Download your data</p>
-                          <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                            Get a copy of all your articles, drafts, and account information in JSON format.
-                          </p>
-                          <button
-                            onClick={handleExportData}
-                            className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                          >
-                            Request Export
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Account Deletion</h3>
-                    
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-red-900 dark:text-red-100">Delete your account</p>
-                          <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                            Permanently delete your account and all associated data. This action cannot be undone.
-                          </p>
-                          <button
-                            onClick={handleDeleteAccount}
-                            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                          >
-                            Delete Account
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Save Button */}
-            <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Changes are saved automatically
-                </p>
-                <button
-                  onClick={handleSave}
-                  className="flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              <div className="pt-8 border-t border-gray-200 mt-8">
+                <div
+                  className="text-red-600 cursor-pointer hover:text-red-700 font-medium"
+                  onClick={handleDeleteAccount}
                 >
-                  <Save className="w-4 h-4" />
-                  <span>Save Changes</span>
-                </button>
+                  Deactivate account
+                </div>
+                <p className="text-gray-600 text-sm mt-1">
+                  Deactivating will suspend your account until you sign back in.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <div
+                  className="text-red-600 cursor-pointer hover:text-red-700 font-medium"
+                  onClick={handleDeleteAccount}
+                >
+                  Delete account
+                </div>
+                <p className="text-gray-600 text-sm mt-1">
+                  Permanently delete your account and all of your content.
+                </p>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Publishing Tab */}
+          {activeTab === "publishing" && (
+            <div className="space-y-0">
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Manage publications
+                </h2>
+              </div>
+
+              <SettingRow
+                title="Allow readers to leave private notes on your stories"
+                description="Private notes are visible to you and (if left in a publication) all Editors of the publication."
+                children={
+                  <ToggleSwitch
+                    checked={settings.publishing.allowPrivateNotes}
+                    onChange={() =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        publishing: {
+                          ...prev.publishing,
+                          allowPrivateNotes: !prev.publishing.allowPrivateNotes,
+                        },
+                      }))
+                    }
+                  />
+                }
+              />
+
+              <SettingRow
+                title="Manage tipping on your stories"
+                description="Readers can send you tips through the third-party platform of your choice."
+                children={<span className="text-gray-600">Disabled</span>}
+              />
+
+              <div className="pt-8 border-t border-gray-200 mt-8">
+                <SettingRow
+                  title="Allow email replies"
+                  description="Let readers reply to your stories directly from their email."
+                  children={
+                    <ToggleSwitch
+                      checked={settings.publishing.allowEmailReplies}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          publishing: {
+                            ...prev.publishing,
+                            allowEmailReplies:
+                              !prev.publishing.allowEmailReplies,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <SettingRow
+                  title="'Reply To' email address"
+                  description="Shown to your subscribers when they reply."
+                  children={
+                    <span className="text-gray-600">
+                      {settings.publishing.replyToEmail}
+                    </span>
+                  }
+                />
+
+                <SettingRow
+                  title="Import email subscribers"
+                  description="Upload a CSV or TXT file containing up to 25,000 email addresses."
+                  onClick={() => {}}
+                />
+              </div>
+
+              <div className="pt-8 border-t border-gray-200 mt-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Promote email subscriptions
+                </h3>
+
+                <SettingRow
+                  title="Share your subscribe page"
+                  description="This page allows readers to subscribe to you via email."
+                  children={
+                    <div className="flex items-center space-x-2">
+                      <span className="text-gray-600">
+                        https://medium.com/subscrib...
+                      </span>
+                      <ExternalLink className="w-4 h-4 text-gray-400" />
+                    </div>
+                  }
+                  onClick={() => {}}
+                />
+
+                <SettingRow
+                  title="Customize your subscription promotion message"
+                  description="This is the message on your subscribe and profile pages."
+                  children={
+                    <span className="text-gray-600">
+                      Get an email whenever Aheli...
+                    </span>
+                  }
+                />
+
+                <SettingRow
+                  title="Display a subscription promotion message"
+                  description="A message will display after the second story on your profile."
+                  children={
+                    <ToggleSwitch checked={false} onChange={() => {}} />
+                  }
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Notifications Tab */}
+          {activeTab === "notifications" && (
+            <div className="space-y-0">
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Email notifications
+                </h2>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Story recommendations
+                </h3>
+
+                <SettingRow
+                  title="New Medium Digest"
+                  description="The best stories on Medium personalized based on your interests, as well as outstanding stories selected by our editors."
+                  children={
+                    <ToggleSwitch
+                      checked={settings.notifications.weeklyDigest}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notifications: {
+                            ...prev.notifications,
+                            weeklyDigest: !prev.notifications.weeklyDigest,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <SettingRow
+                  title="Recommended reading"
+                  description="Featured stories, columns, and collections that we think you'll enjoy based on your reading history."
+                  children={
+                    <ToggleSwitch
+                      checked={settings.notifications.emailNotifications}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notifications: {
+                            ...prev.notifications,
+                            emailNotifications:
+                              !prev.notifications.emailNotifications,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+              </div>
+
+              <div className="mb-8 pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  From writers and publications
+                </h3>
+
+                <SettingRow
+                  title="New stories added to lists you've saved"
+                  children={<ToggleSwitch checked={true} onChange={() => {}} />}
+                />
+
+                <SettingRow
+                  title="Manage subscriptions"
+                  children={
+                    <span className="text-gray-600">Michael Ryaboy</span>
+                  }
+                />
+              </div>
+
+              <div className="mb-8 pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Social activity
+                </h3>
+
+                <SettingRow
+                  title="When someone follows you or highlights the same passage in a story"
+                  children={
+                    <ToggleSwitch
+                      checked={settings.notifications.newFollowers}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notifications: {
+                            ...prev.notifications,
+                            newFollowers: !prev.notifications.newFollowers,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <SettingRow
+                  title="When someone mentions you in their story"
+                  children={
+                    <select
+                      value="in-network"
+                      onChange={() => {}}
+                      className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    >
+                      <option value="in-network">In network</option>
+                      <option value="everyone">Everyone</option>
+                      <option value="no-one">No one</option>
+                    </select>
+                  }
+                />
+              </div>
+
+              <div className="pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  For writers
+                </h3>
+
+                <SettingRow
+                  title="Notifications on your published stories"
+                  children={
+                    <ToggleSwitch
+                      checked={settings.notifications.articleLikes}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notifications: {
+                            ...prev.notifications,
+                            articleLikes: !prev.notifications.articleLikes,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <SettingRow
+                  title="Notifications on your lists"
+                  children={
+                    <ToggleSwitch
+                      checked={settings.notifications.comments}
+                      onChange={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notifications: {
+                            ...prev.notifications,
+                            comments: !prev.notifications.comments,
+                          },
+                        }))
+                      }
+                    />
+                  }
+                />
+
+                <SettingRow
+                  title="From editors about featuring your stories"
+                  children={<ToggleSwitch checked={true} onChange={() => {}} />}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Membership Tab */}
+          {activeTab === "membership" && (
+            <div className="space-y-0">
+              <SettingRow
+                title="Upgrade to a Medium Membership"
+                description="Subscribe for unlimited access to the smartest writers and biggest ideas on Medium."
+                onClick={() => {}}
+              />
+            </div>
+          )}
+
+          {/* Security Tab */}
+          {activeTab === "security" && (
+            <div className="space-y-0">
+              <SettingRow title="Change password" onClick={() => {}} />
+
+              <SettingRow
+                title="Two-factor authentication"
+                description="Add an extra layer of security to your account."
+                children={
+                  <span
+                    className={`px-3 py-1 rounded text-sm ${
+                      settings.privacy.twoFactorAuth
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {settings.privacy.twoFactorAuth ? "Enabled" : "Not enabled"}
+                  </span>
+                }
+                onClick={() =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    privacy: {
+                      ...prev.privacy,
+                      twoFactorAuth: !prev.privacy.twoFactorAuth,
+                    },
+                  }))
+                }
+              />
+
+              <SettingRow
+                title="Connected accounts"
+                description="Manage your connected social media accounts."
+                onClick={() => {}}
+              />
+
+              <SettingRow
+                title="Active sessions"
+                description="See where you're logged in and manage your active sessions."
+                onClick={() => {}}
+              />
+            </div>
+          )}
         </div>
       </div>
-    </div>
+      
+
+      {isModalOpen && (
+        <>
+          <ProfileModal
+            isOpen={isModalOpen}
+            onClose={() => setIsmodalOpen(false)}
+          />
+        </>
+      )}
+    </>
   );
 };
 

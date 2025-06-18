@@ -229,7 +229,7 @@ const About: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {[
                 { number: '50K+', label: 'Active Writers' },
-                { number: '1M+', label: 'Articles Published' },
+                { number: '1M+', label: 'Blogs Published' },
                 { number: '10M+', label: 'Monthly Readers' },
                 { number: '150+', label: 'Countries Reached' }
               ].map((stat, index) => (
