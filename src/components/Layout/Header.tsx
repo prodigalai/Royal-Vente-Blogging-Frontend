@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Sun,
   Moon,
@@ -26,6 +26,7 @@ const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { site, setSite } = useSite();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -91,6 +92,14 @@ const Header: React.FC = () => {
             </div>
           </div>
 
+          {/* Draft indicator for create page */}
+          {location.pathname === "/create" && (
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-full border border-amber-200 dark:border-amber-800">
+              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Draft</span>
+            </div>
+          )}
+
           {/* Search (hidden on xs) */}
           <div className="flex-1 max-w-md mx-8 hidden sm:block">
             <div
@@ -112,13 +121,23 @@ const Header: React.FC = () => {
           {/* Right-hand actions */}
           <div className="flex items-center space-x-4">
             {/* Write button */}
-            <Link
-              to="/create"
-              className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-700 transition-colors"
-            >
-              <PenTool className="w-4 h-4" />
-              <span>Write</span>
-            </Link>
+            {site === "blog" ? (
+              <Link
+                to="/create"
+                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-700 transition-colors"
+              >
+                <PenTool className="w-4 h-4" />
+                <span>Write</span>
+              </Link>
+            ) : (
+              <Link
+                to="/newsletter/create"
+                className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-700 transition-colors"
+              >
+                <PenTool className="w-4 h-4" />
+                <span>Create</span>
+              </Link>
+            )}
 
             {/* Theme toggle */}
             <button
@@ -226,14 +245,16 @@ const Header: React.FC = () => {
                     <Building2 className="w-4 h-4" />
                     <span>Create Organization</span>
                   </Link>
-                  <Link
-                    to="/library"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    <span>My Library</span>
-                  </Link>
+                  {site === "blog" && (
+                    <Link
+                      to="/library"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <Bookmark className="w-4 h-4" />
+                      <span>My Library</span>
+                    </Link>
+                  )}
                   <Link
                     to="/user-dashboard"
                     onClick={() => setIsProfileMenuOpen(false)}

@@ -186,7 +186,7 @@ const UnifiedInsertMenu: React.FC<UnifiedInsertMenuProps> = ({ onInsert, positio
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   content,
   onChange,
-  placeholder = "Tell your story...",
+  placeholder = "Start writing...",
 }) => {
   const editorRef = useRef<HTMLDivElement>(null)
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 })

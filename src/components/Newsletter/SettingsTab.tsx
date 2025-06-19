@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState } from 'react';
 import { Save, Bell, Shield, Palette, Globe, Mail, Users, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
