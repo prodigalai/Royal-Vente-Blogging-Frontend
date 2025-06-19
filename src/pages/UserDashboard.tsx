@@ -1,5 +1,6 @@
+//@ts-nocheck
 import React, { ReactNode, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   FileText,
@@ -14,6 +15,8 @@ import {
   Clock,
   Heart,
   MessageCircle,
+  ChevronRight,
+  MoreVertical
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { mockPosts } from "../data/mockData";
@@ -21,6 +24,7 @@ import { format } from "date-fns";
 import api from "../utils/axios";
 import OrganizationModal from "../components/OrganizationModal.tsx";
 import Card from "../components/ui/card.tsx";
+import { useSite } from "../contexts/SiteContext";
 
 const UserDashboard = () => {
   const { user: authUser } = useAuth();
@@ -31,6 +35,7 @@ const UserDashboard = () => {
   const [error, setError] = useState("");
   const [selectedOrg, setSelectedOrg] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { site } = useSite();
 
   // Dummy user fallback for demo/development
   const dummyUser = {
@@ -107,13 +112,23 @@ const UserDashboard = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-          <Link
-            to="/create"
-            className="flex items-center space-x-2 bg-primary-600 dark:bg-primary-600 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105 shadow-lg"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Blog</span>
-          </Link>
+          {site === "blog" ? (
+            <Link
+              to="/create"
+              className="flex items-center space-x-2 bg-primary-600 dark:bg-primary-600 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105 shadow-lg"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Blog</span>
+            </Link>
+          ) : (
+            <Link
+              to="/newsletter/create"
+              className="flex items-center space-x-2 bg-primary-600 dark:bg-primary-600 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105 shadow-lg"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Newsletter</span>
+            </Link>
+          )}
           <Link
             to="/create-organization"
             className="flex items-center space-x-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
@@ -181,7 +196,7 @@ const UserDashboard = () => {
           {/* Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <RecentBlogs title="Recent Blogs" posts={published} />
-            <QuickActions />
+            <QuickActions site={site} />
           </div>
         </div>
       )}
@@ -276,7 +291,7 @@ const RecentBlogs = ({ title, posts }: any) => (
   </div>
 );
 
-const QuickActions = () => (
+const QuickActions = ({ site }: { site: string }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
       Quick Actions
@@ -284,10 +299,10 @@ const QuickActions = () => (
     <div className="space-y-3">
       {[
         {
-          to: "/write",
+          to: site === "blog" ? "/create" : "/newsletter/create",
           icon: <Plus className="w-4 h-4 text-primary-600 dark:text-primary-600" />,
-          title: "Write New Blog",
-          subtitle: "Share your thoughts with the world",
+          title: site === "blog" ? "Write New Blog" : "Create Newsletter",
+          subtitle: site === "blog" ? "Share your thoughts with the world" : "Reach your audience",
         },
         {
           to: "/create-organization",

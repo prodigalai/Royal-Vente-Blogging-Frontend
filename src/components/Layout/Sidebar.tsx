@@ -12,7 +12,8 @@ import {
   Mail,
   LayoutList,
   Share2,
-  TrendingUp
+  TrendingUp,
+  Settings
 } from "lucide-react";
 import { useSite } from "../../contexts/SiteContext";
 
@@ -30,6 +31,7 @@ const navItems = {
     { name: "Create Newsletter", href: "/newsletter/create", icon: PenTool },
     { name: "Social Media", href: "/newsletter/social", icon: Share2 },
     { name: "Analytics Dashboard", href: "/newsletter/analytics", icon: TrendingUp },
+    { name: "Settings", href: "/newsletter/settings", icon: Settings },
   ],
 } as const;
 

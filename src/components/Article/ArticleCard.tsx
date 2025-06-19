@@ -107,53 +107,55 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 
   if (variant === "compact") {
     return (
-      <article className="group">
-        <Link to={`/article/${article.id}`} className="flex space-x-4">
-          <div className="flex-1">
+      <article className="group overflow-hidden">
+        <div className="flex space-x-3">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-2">
-              <Link
-                to={`/profile/${article.author.username}`}
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.location.href = `/profile/${article.author.username}`;
+                }}
+                className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer flex-shrink-0"
               >
                 {renderAvatar()}
-                <span className="text-sm text-gray-600">
+                <span className="text-xs text-gray-600 truncate">
                   {article.author.displayName}
                 </span>
-              </Link>
-              <span className="text-gray-400">·</span>
-              <span className="text-sm text-gray-500">
+              </button>
+              <span className="text-gray-400 flex-shrink-0">·</span>
+              <span className="text-xs text-gray-500 flex-shrink-0">
                 {formatDate(article.publishedAt)}
               </span>
             </div>
 
-            <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors mb-1 line-clamp-2">
-              {article.title}
-            </h3>
+            <Link to={`/article/${article.id}`}>
+              <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors mb-1 line-clamp-2 text-sm leading-tight">
+                {article.title}
+              </h3>
+            </Link>
 
-            <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+            <p className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2 mb-2 leading-relaxed">
               {article.excerpt}
             </p>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 text-gray-500 text-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center space-x-3 text-gray-500 text-xs flex-shrink-0">
                 <div className="flex items-center space-x-1">
-                  <Heart className="w-4 h-4" />
+                  <Heart className="w-3 h-3" />
                   <span>{article.likes}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{article.comments}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{article.readTime} min</span>
+                  <Clock className="w-3 h-3" />
+                  <span>{article.readTime}min</span>
                 </div>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 flex-wrap justify-end min-w-0">
                 {article.tags.slice(0, 2).map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded-full"
+                    className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300 rounded-full truncate max-w-16"
+                    title={tag}
                   >
                     {tag}
                   </span>
@@ -161,7 +163,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
               </div>
             </div>
           </div>
-        </Link>
+        </div>
       </article>
     );
   }
@@ -169,23 +171,26 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <>
     <article className="group">
-      <Link to={`/blogs/${article.id}`}>
-        <div className="flex items-center space-x-2 mb-3">
-          <Link
-            to={`/profile/${article.author.username}`}
-            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-          >
-            {renderAvatar()}
-            <span className="text-sm text-gray-600">
-              {article.author.displayName}
-            </span>
-          </Link>
-          <span className="text-gray-400">·</span>
-          <span className="text-sm text-gray-500">
-            {formatDate(article.publishedAt)}
+      <div className="flex items-center space-x-2 mb-3">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            window.location.href = `/profile/${article.author.username}`;
+          }}
+          className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
+        >
+          {renderAvatar()}
+          <span className="text-sm text-gray-600">
+            {article.author.displayName}
           </span>
-        </div>
+        </button>
+        <span className="text-gray-400">·</span>
+        <span className="text-sm text-gray-500">
+          {formatDate(article.publishedAt)}
+        </span>
+      </div>
 
+      <Link to={`/blogs/${article.id}`}>
         <div className="flex space-x-4">
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">

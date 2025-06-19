@@ -44,15 +44,12 @@ const Newsletter: React.FC = () => {
   const totalSubscribers = subscribers.length;
 
   const tabs = [
-    { key: "overview",      label: "Overview",       icon: BarChart3 },
-    { key: "campaigns",     label: "Campaigns",      icon: Send,       count: campaigns.length },
+    { key: "overview" as const,      label: "Overview",       icon: BarChart3 },
+    { key: "campaigns" as const,     label: "Campaigns",      icon: Send,       count: campaigns.length },
     // { key: "templates",     label: "Templates",      icon: Palette,    count: templates.length },
-    { key: "subscribers",   label: "Subscribers",    icon: Users,      count: totalSubscribers },
-    { key: "automations",   label: "Automations",    icon: Zap,        count: automations.length },
-    { key: "social-media",  label: "Social Media",   icon: Share2 },
-    { key: "analytics",     label: "Analytics",      icon: TrendingUp },
-    { key: "settings",      label: "Settings",       icon: Settings },
-  ] as const;
+    { key: "subscribers" as const,   label: "Subscribers",    icon: Users,      count: totalSubscribers },
+    { key: "automations" as const,   label: "Automations",    icon: Zap,        count: automations.length },
+  ];
 
   const renderTabContent = () => {
     switch (activeTab) {
